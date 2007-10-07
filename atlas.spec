@@ -313,7 +313,6 @@ for TYPE in %{types}; do
   mkdir tmp
   pushd tmp
     ar x %{_libdir}/liblapack.a
-    for f in *.static.o; do mv $f `basename $f .static.o`.o; done
     ar x ../lib/$BUILD_DIR/liblapack_atlas.a
     ar x ../lib/$BUILD_DIR/libcblas.a
   popd
@@ -408,8 +407,7 @@ for TYPE in %{types}; do
 
   mkdir tmp
   pushd tmp
-    ar x %{_libdir}/liblapack.a
-    for f in *.static.o; do mv $f `basename $f .static.o`.o; done
+    ar x %{_libdir}/liblapack_pic.a
     ar x ../lib/$BUILD_DIR/liblapack_atlas.a
     ar x ../lib/$BUILD_DIR/libcblas.a
   popd
