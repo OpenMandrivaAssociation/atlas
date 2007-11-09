@@ -60,7 +60,7 @@ ATLAS (Automatically Tuned Linear Algebra Software).
 
 %package -n %{libname}-devel
 Summary:        Development libraries for ATLAS
-Group:          Development/Libraries
+Group:          Sciences/Mathematics
 Requires:       %{libname} = %{version}-%{release}
 Provides:	%{libname_orig}-devel = %{version}-%{release}
 Provides:	%{name}-devel = %{version}-%{release}
