@@ -25,6 +25,7 @@ Source0:        http://prdownloads.sourceforge.net/math-atlas/%{name}%{version}.
 Source1:        README.Fedora
 Patch0:         http://ftp.debian.org/debian/pool/main/a/atlas3/%{name}3_%{version}-20.6.diff.gz
 Patch1:         %{name}-%{version}-gfortran.patch
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 
 Requires:       /etc/ld.so.conf.d
 Requires(post): /sbin/ldconfig
