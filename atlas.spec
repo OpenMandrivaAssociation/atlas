@@ -1,6 +1,6 @@
 %define name	atlas
 %define version	3.6.0
-%define release	3
+%define release	4
 
 # Separate library version numbers are needed for different libraries
 # because Mandriva's reference blas and lapack packages have different
