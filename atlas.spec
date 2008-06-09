@@ -28,8 +28,6 @@ Patch1:         %{name}-%{version}-gfortran.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 
 Requires:       /etc/ld.so.conf.d
-Requires(post): /sbin/ldconfig
-Requires(postun): /sbin/ldconfig
 BuildRequires:  gcc-gfortran, lapack-devel, expect, sed, sharutils
 
 %description
