@@ -452,37 +452,61 @@ done
 %clean
 %__rm -rf $RPM_BUILD_ROOT
 
+%if %mdkversion < 200900
 %post -n %{libname} -p /sbin/ldconfig
+%endif
 
+%if %mdkversion < 200900
 %postun -n %{libname} -p /sbin/ldconfig
+%endif
 
 %ifarch i586
 
+%if %mdkversion < 200900
 %post -n %{libname}-sse -p /sbin/ldconfig
+%endif
 
+%if %mdkversion < 200900
 %postun -n %{libname}-sse -p /sbin/ldconfig
+%endif
 
+%if %mdkversion < 200900
 %post -n %{libname}-sse2 -p /sbin/ldconfig
+%endif
 
+%if %mdkversion < 200900
 %postun -n %{libname}-sse2 -p /sbin/ldconfig
+%endif
 
+%if %mdkversion < 200900
 %post -n %{libname}-3dnow -p /sbin/ldconfig
+%endif
 
+%if %mdkversion < 200900
 %postun -n %{libname}-3dnow -p /sbin/ldconfig
+%endif
 
 %endif
 %ifarch ppc
 
+%if %mdkversion < 200900
 %post -n %{libname}-altivec -p /sbin/ldconfig
+%endif
 
+%if %mdkversion < 200900
 %postun -n %{libname}-altivec -p /sbin/ldconfig
+%endif
 
 %endif
 %if "%{?enable_custom_atlas}" == "1"
 
+%if %mdkversion < 200900
 %post -n %{libname}-custom -p /sbin/ldconfig
+%endif
 
+%if %mdkversion < 200900
 %postun -n %{libname}-custom -p /sbin/ldconfig
+%endif
 
 %files -n %{libname}-custom
 %defattr(-,root,root,-)
