@@ -1,16 +1,10 @@
 %define name	atlas
 %define version	3.6.0
-%define release	4
+%define release	5
 
-# Separate library version numbers are needed for different libraries
-# because Mandriva's reference blas and lapack packages have different
-# version numbers:
-%define lapack_ver 3
-%define lapack_major %{lapack_ver}.0
-%define blas_ver   1
-%define blas_major %{blas_ver}.1
-
-%define major   %{lapack_major}
+%define major		3
+%define lapack_major 	%{major}
+%define lapack_ver   	%{major}.2
 %define	libname_orig	lib%{name}
 %define libname	%mklibname %name %{major}
 
@@ -23,7 +17,7 @@ License:        BSD
 URL:            http://math-atlas.sourceforge.net/
 Source0:        http://prdownloads.sourceforge.net/math-atlas/%{name}%{version}.tar.bz2
 Source1:        README.Fedora
-Patch0:         http://ftp.debian.org/debian/pool/main/a/atlas3/%{name}3_%{version}-20.6.diff.gz
+Patch0:         http://ftp.debian.org/debian/pool/main/a/atlas/%{name}_%{version}-22.diff.gz
 Patch1:         %{name}-%{version}-gfortran.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -220,7 +214,7 @@ all compile-time optimizations enabled.
 
 %prep
 %setup -q -n ATLAS
-%patch0 -p1
+zcat %{PATCH0} | sed -e s,gcc-4.3,gcc,g | sed -e s,gfortran-4.3,gfortran,g | patch -p1
 %patch1 -p0
 cp %{SOURCE1} doc
 
@@ -350,9 +344,9 @@ for TYPE in %{types}; do
     rm -f ilaenv.o
   popd
   cc -shared -Wl,-soname=libatlas.so.%{lapack_major} \
-	-o lib/$BUILD_DIR/libatlas.so.%{lapack_major} tmp/*.o -lm
-  ln -s libatlas.so.%{lapack_major} lib/$BUILD_DIR/libatlas.so.%{lapack_ver}
-  ln -s libatlas.so.%{lapack_major} lib/$BUILD_DIR/libatlas.so
+	-o lib/$BUILD_DIR/libatlas.so.%{lapack_ver} tmp/*.o -lm
+  ln -s libatlas.so.%{lapack_ver} lib/$BUILD_DIR/libatlas.so.%{lapack_major}
+  ln -s libatlas.so.%{lapack_ver} lib/$BUILD_DIR/libatlas.so
   rm -rf tmp
 
   mkdir tmp
@@ -360,10 +354,10 @@ for TYPE in %{types}; do
     ar x ../lib/$BUILD_DIR/libcblas.a
     rm -f ilaenv.o
   popd
-  cc -shared -Wl,-soname=libcblas.so.%{blas_major} \
-	-o lib/$BUILD_DIR/libcblas.so.%{blas_major} tmp/*.o -L lib/$BUILD_DIR -latlas
-  ln -s libcblas.so.%{blas_major} lib/$BUILD_DIR/libcblas.so.%{blas_ver}
-  ln -s libcblas.so.%{blas_major} lib/$BUILD_DIR/libcblas.so
+  cc -shared -Wl,-soname=libcblas.so.%{lapack_major} \
+	-o lib/$BUILD_DIR/libcblas.so.%{lapack_ver} tmp/*.o -L lib/$BUILD_DIR -latlas
+  ln -s libcblas.so.%{lapack_ver} lib/$BUILD_DIR/libcblas.so.%{lapack_major}
+  ln -s libcblas.so.%{lapack_ver} lib/$BUILD_DIR/libcblas.so
   rm -rf tmp
 
   mkdir tmp
@@ -371,11 +365,11 @@ for TYPE in %{types}; do
     ar x ../lib/$BUILD_DIR/libf77blas.a
     rm -f ilaenv.o
   popd
-  cc -shared -Wl,-soname=libf77blas.so.%{blas_major} \
-	-o lib/$BUILD_DIR/libf77blas.so.%{blas_major} tmp/*.o \
+  cc -shared -Wl,-soname=libf77blas.so.%{lapack_major} \
+	-o lib/$BUILD_DIR/libf77blas.so.%{lapack_ver} tmp/*.o \
 	-L lib/$BUILD_DIR -latlas -lgfortran
-  ln -s libf77blas.so.%{blas_major} lib/$BUILD_DIR/libf77blas.so.%{blas_ver}
-  ln -s libf77blas.so.%{blas_major} lib/$BUILD_DIR/libf77blas.so
+  ln -s libf77blas.so.%{lapack_ver} lib/$BUILD_DIR/libf77blas.so.%{lapack_major}
+  ln -s libf77blas.so.%{lapack_ver} lib/$BUILD_DIR/libf77blas.so
   rm -rf tmp
 
   mkdir tmp
@@ -384,10 +378,10 @@ for TYPE in %{types}; do
     rm -f ilaenv.o
   popd
   cc -shared -Wl,-soname=liblapack_atlas.so.%{lapack_major} \
-	-o lib/$BUILD_DIR/liblapack_atlas.so.%{lapack_major} tmp/*.o \
+	-o lib/$BUILD_DIR/liblapack_atlas.so.%{lapack_ver} tmp/*.o \
 	-L lib/$BUILD_DIR -lcblas -lf77blas
-  ln -s liblapack_atlas.so.%{lapack_major} lib/$BUILD_DIR/liblapack_atlas.so.%{lapack_ver}
-  ln -s liblapack_atlas.so.%{lapack_major} lib/$BUILD_DIR/liblapack_atlas.so
+  ln -s liblapack_atlas.so.%{lapack_ver} lib/$BUILD_DIR/liblapack_atlas.so.%{lapack_major}
+  ln -s liblapack_atlas.so.%{lapack_ver} lib/$BUILD_DIR/liblapack_atlas.so
   rm -rf tmp
 
   # Create replacement for BLAS and LAPACK Libraries
@@ -397,10 +391,10 @@ for TYPE in %{types}; do
     ar x ../lib/$BUILD_DIR/libf77blas.a
     ar x ../lib/$BUILD_DIR/libcblas.a
   popd
-  cc -shared -Wl,-soname=libblas.so.%{blas_major} \
-	-o lib/$BUILD_DIR/libblas.so.%{blas_major} tmp/*.o -lgfortran
-  ln -s libblas.so.%{blas_major} lib/$BUILD_DIR/libblas.so.%{blas_ver}
-  ln -s libblas.so.%{blas_major} lib/$BUILD_DIR/libblas.so
+  cc -shared -Wl,-soname=libblas.so.%{lapack_major} \
+	-o lib/$BUILD_DIR/libblas.so.%{lapack_ver} tmp/*.o -lgfortran
+  ln -s libblas.so.%{lapack_ver} lib/$BUILD_DIR/libblas.so.%{lapack_major}
+  ln -s libblas.so.%{lapack_ver} lib/$BUILD_DIR/libblas.so
   rm -rf tmp
 
   mkdir tmp
@@ -410,10 +404,10 @@ for TYPE in %{types}; do
     ar x ../lib/$BUILD_DIR/libcblas.a
   popd
   cc -shared -Wl,-soname=liblapack.so.%{lapack_major} \
-	-o lib/$BUILD_DIR/liblapack.so.%{lapack_major} tmp/*.o \
+	-o lib/$BUILD_DIR/liblapack.so.%{lapack_ver} tmp/*.o \
 	-L lib/$BUILD_DIR -lblas -lgfortran
-  ln -s liblapack.so.%{lapack_major} lib/$BUILD_DIR/liblapack.so.%{lapack_ver}
-  ln -s liblapack.so.%{lapack_major} lib/$BUILD_DIR/liblapack.so
+  ln -s liblapack.so.%{lapack_ver} lib/$BUILD_DIR/liblapack.so.%{lapack_major}
+  ln -s liblapack.so.%{lapack_ver} lib/$BUILD_DIR/liblapack.so
   rm -rf tmp
 done
 
@@ -436,10 +430,7 @@ for TYPE in %{types}; do
       > $RPM_BUILD_ROOT/etc/ld.so.conf.d/atlas-custom-%{_arch}.conf
   else
     EXTDIR=$TYPE
-    if [ "$TYPE" != "sse2" ]; then
-      echo "/usr/lib/$TYPE" \
-        > $RPM_BUILD_ROOT/etc/ld.so.conf.d/atlas-$TYPE.conf
-    fi
+    echo "/usr/lib/$TYPE" > $RPM_BUILD_ROOT/etc/ld.so.conf.d/atlas-$TYPE.conf
   fi
 
   mkdir -p $RPM_BUILD_ROOT%{_libdir}/${EXTDIR}
@@ -562,7 +553,7 @@ done
 %doc debian/copyright doc/README.Fedora
 %dir %{_libdir}/sse2
 %{_libdir}/sse2/*.so.*
-# sse2 has no conf file
+%config(noreplace) /etc/ld.so.conf.d/atlas-sse2.conf
 
 %files -n %{libname}-sse2-devel
 %defattr(-,root,root,-)
