@@ -1,12 +1,13 @@
 %define name	atlas
 %define version	3.6.0
-%define release	5
+%define release	6
 
 %define major		3
 %define lapack_major 	%{major}
 %define lapack_ver   	%{major}.2
 %define	libname_orig	lib%{name}
-%define libname	%mklibname %name %{major}
+%define libname		%mklibname %name %{major}
+%define libname_old	lib%{name}3.0
 
 Name:           %{name}
 Version:        %{version}
@@ -20,7 +21,6 @@ Source1:        README.Fedora
 Patch0:         http://ftp.debian.org/debian/pool/main/a/atlas/%{name}_%{version}-22.diff.gz
 Patch1:         %{name}-%{version}-gfortran.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
-
 Requires:       /etc/ld.so.conf.d
 BuildRequires:  gcc-gfortran, lapack-devel, expect, sed, sharutils
 
@@ -45,19 +45,22 @@ Summary:        ATLAS shared libraries
 Group:          Sciences/Mathematics
 Provides:   	%{libname_orig} = %{version}-%{release}
 Provides:   	%{name} = %{version}-%{release}
+Obsoletes:	%{libname_old}
 
 %description -n %{libname}
 This package contains the shared libraries for programs linked against 
 ATLAS (Automatically Tuned Linear Algebra Software).
 
-%package -n %{libname}-devel
+%package -n %{libname_orig}-devel
 Summary:        Development libraries for ATLAS
 Group:          Sciences/Mathematics
 Requires:       %{libname} = %{version}-%{release}
 Provides:	%{libname_orig}-devel = %{version}-%{release}
 Provides:	%{name}-devel = %{version}-%{release}
+Obsoletes:	%mklibname -d %{name} 3
+Obsoletes:	%mklibname -d %{name} 3.0
 
-%description -n %{libname}-devel
+%description -n %{libname_orig}-devel
 This package contains the static libraries and headers for development
 with ATLAS (Automatically Tuned Linear Algebra Software).
 
@@ -76,44 +79,49 @@ Summary:        ATLAS libraries for SSE extensions
 Group:          Sciences/Mathematics
 Provides:   	%{libname_orig}-sse = %{version}-%{release}
 Provides:   	%{name}-sse = %{version}-%{release}
+Obsoletes:	%{libname_old}-sse
 
 %description -n %{libname}-sse
 This package contains the ATLAS (Automatically Tuned Linear Algebra
 Software) libraries compiled with optimizations for the SSE extensions
 to the ix86 architecture.
 
-%package -n %{libname}-sse-devel
+%package -n %{libname_orig}-sse-devel
 Summary:        Development libraries for ATLAS with SSE extensions
 Group:          Sciences/Mathematics
 Requires:       %{libname}-sse = %{version}-%{release}
 Provides:	%{libname_orig}-sse-devel = %{version}-%{release}
 Provides:	%{name}-sse-devel = %{version}-%{release}
+Obsoletes:	%mklibname -d %{name}3-sse
+Obsoletes:	%mklibname -d %{name}3.0-sse
 
-%description -n %{libname}-sse-devel
+%description -n %{libname_orig}-sse-devel
 This package contains headers and static versions of the ATLAS
 (Automatically Tuned Linear Algebra Software) libraries compiled with
 optimizations for the SSE extensions to the ix86 architecture.
-
 
 %package -n %{libname}-sse2
 Summary:        ATLAS libraries for SSE2 extensions
 Group:          Sciences/Mathematics
 Provides:   	%{libname_orig}-sse2 = %{version}-%{release}
 Provides:   	%{name}-sse2 = %{version}-%{release}
+Obsoletes:	%{libname_old}-sse2
 
 %description -n %{libname}-sse2
 This package contains the ATLAS (Automatically Tuned Linear Algebra
 Software) libraries compiled with optimizations for the SSE2
 extensions to the ix86 architecture.
 
-%package -n %{libname}-sse2-devel
+%package -n %{libname_orig}-sse2-devel
 Summary:        Development libraries for ATLAS with SSE2 extensions
 Group:          Sciences/Mathematics
 Requires:       %{libname}-sse2 = %{version}-%{release}
 Provides:	%{libname_orig}-sse2-devel = %{version}-%{release}
 Provides:	%{name}-sse2-devel = %{version}-%{release}
+Obsoletes:	%mklibname -d %{name}3-sse2
+Obsoletes:	%mklibname -d %{name}3.0-sse2
 
-%description -n %{libname}-sse2-devel
+%description -n %{libname_orig}-sse2-devel
 This package contains headers and static versions of the ATLAS
 (Automatically Tuned Linear Algebra Software) libraries compiled with
 optimizations for the SSE2 extensions to the ix86 architecture.
@@ -123,20 +131,23 @@ Summary:        ATLAS libraries for 3DNow extensions
 Group:          Sciences/Mathematics
 Provides:   	%{libname_orig}-3dnow = %{version}-%{release}
 Provides:   	%{name}-3dnow = %{version}-%{release}
+Obsoletes:	%{libname_old}-3dnow
 
 %description -n %{libname}-3dnow
 This package contains the ATLAS (Automatically Tuned Linear Algebra
 Software) libraries compiled with optimizations for the 3DNow
 extensions to the ix86 architecture.
 
-%package -n %{libname}-3dnow-devel
+%package -n %{libname_orig}-3dnow-devel
 Summary:        Development libraries for ATLAS with 3DNow extensions
 Group:         	Sciences/Mathematics
 Requires:       %{libname}-3dnow = %{version}-%{release}
 Provides:	%{libname_orig}-3dnow-devel = %{version}-%{release}
 Provides:	%{name}-3dnow-devel = %{version}-%{release}
+Obsoletes:	%mklibname -d %{name}3-3dnow
+Obsoletes:	%mklibname -d %{name}3.0-3dnow
 
-%description -n %{libname}-3dnow-devel
+%description -n %{libname_orig}-3dnow-devel
 This package contains headers and static versions of the ATLAS
 (Automatically Tuned Linear Algebra Software) libraries compiled with
 optimizations for the 3DNow extensions to the ix86 architecture.
@@ -152,20 +163,23 @@ Summary:        ATLAS libraries for AltiVec extensions
 Group:          Science/Mathematics
 Provides:   	%{libname_orig}-altivec = %{version}-%{release}
 Provides:   	%{name}-altivec = %{version}-%{release}
+Obsoletes:	%{libname_old}-altivec
 
 %description -n %{libname}-altivec
 This package contains the ATLAS (Automatically Tuned Linear Algebra
 Software) libraries compiled with optimizations for the AltiVec
 extensions to the PowerPC architecture.
 
-%package -n %{libname}-altivec-devel
+%package -n %{libname_orig}-altivec-devel
 Summary:        Development libraries for ATLAS with AltiVec extensions
 Group:          Science/Mathematics
 Requires:       %{libname}-altivec = %{version}-%{release}
 Provides:	%{libname_orig}-altivec-devel = %{version}-%{release}
 Provides:	%{name}-altivec-devel = %{version}-%{release}
+Obsoletes:	%mklibname -d %{name}3-altivec
+Obsoletes:	%mklibname -d %{name}3.0-altivec
 
-%description -n %{libname}-altivec-devel
+%description -n %{libname_orig}-altivec-devel
 This package contains headers and static versions of the ATLAS
 (Automatically Tuned Linear Algebra Software) libraries compiled with
 optimizations for the AltiVec extensions to the PowerPC architecture.
@@ -193,19 +207,22 @@ Summary:        Custom-compiled ATLAS libraries
 Group:          Science/Mathematics
 Provides:   	%{libname_orig}-custom = %{version}-%{release}
 Provides:   	%{name}-custom = %{version}-%{release}
+Obsoletes:	%{libname_old}-custom
 
 %description -n %{libname}-custom
 This package contains the ATLAS (Automatically Tuned Linear Algebra
 Software) libraries compiled with all compile-time optimizations enabled.
 
-%package -n %{libname}-custom-devel
+%package -n %{libname_orig}-custom-devel
 Summary:        Custom-compiled development libraries for ATLAS
 Group:          Science/Mathematics
 Requires:       %{libname}-custom = %{version}-%{release}
 Provides:	%{libname_orig}-custom-devel = %{version}-%{release}
 Provides:	%{name}-custom-devel = %{version}-%{release}
+Obsoletes:	%mklibname -d %{name}3-custom
+Obsoletes:	%mklibname -d %{name}3.0-custom
 
-%description -n %{libname}-custom-devel
+%description -n %{libname_orig}-custom-devel
 This package contains headers and static versions of the ATLAS
 (Automatically Tuned Linear Algebra Software) libraries compiled with
 all compile-time optimizations enabled.
@@ -506,7 +523,7 @@ done
 %{_libdir}/atlas-custom/*.so.*
 %config(noreplace) /etc/ld.so.conf.d/atlas-custom-%{_arch}.conf
 
-%files -n %{libname}-custom-devel
+%files -n %{libname_orig}-custom-devel
 %defattr(-,root,root,-)
 %doc debian/copyright doc
 %dir %{_libdir}/atlas-custom
@@ -523,7 +540,7 @@ done
 %{_libdir}/atlas/*.so.*
 %config(noreplace) /etc/ld.so.conf.d/atlas-%{_arch}.conf
 
-%files -n %{libname}-devel
+%files -n %{libname_orig}-devel
 %defattr(-,root,root,-)
 %doc debian/copyright doc
 %{_libdir}/atlas/*.so
@@ -539,7 +556,7 @@ done
 %{_libdir}/sse/*.so.*
 %config(noreplace) /etc/ld.so.conf.d/atlas-sse.conf
 
-%files -n %{libname}-sse-devel
+%files -n %{libname_orig}-sse-devel
 %defattr(-,root,root,-)
 %doc debian/copyright doc
 %dir %{_libdir}/sse
@@ -555,7 +572,7 @@ done
 %{_libdir}/sse2/*.so.*
 %config(noreplace) /etc/ld.so.conf.d/atlas-sse2.conf
 
-%files -n %{libname}-sse2-devel
+%files -n %{libname_orig}-sse2-devel
 %defattr(-,root,root,-)
 %doc debian/copyright doc
 %dir %{_libdir}/sse2
@@ -571,7 +588,7 @@ done
 %{_libdir}/3dnow/*.so.*
 %config(noreplace) /etc/ld.so.conf.d/atlas-3dnow.conf
 
-%files -n %{libname}-3dnow-devel
+%files -n %{libname_orig}-3dnow-devel
 %defattr(-,root,root,-)
 %doc debian/copyright doc
 %dir %{_libdir}/3dnow
@@ -589,7 +606,7 @@ done
 %{_libdir}/altivec/*.so.*
 %config(noreplace) /etc/ld.so.conf.d/atlas-altivec.conf
 
-%files -n %{libname}-altivec-devel
+%files -n %{libname_orig}-altivec-devel
 %defattr(-,root,root,-)
 %doc debian/copyright doc
 %dir %{_libdir}/altivec
