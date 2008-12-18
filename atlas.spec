@@ -1,6 +1,6 @@
 %define name	atlas
 %define version	3.6.0
-%define release	6
+%define release	7
 
 %define major		3
 %define lapack_major 	%{major}
