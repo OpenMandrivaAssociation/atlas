@@ -2,7 +2,7 @@
 # http://cvs.fedoraproject.org/viewvc/rpms/atlas/devel/atlas.spec?revision=1.21
 
 %define name	atlas
-%define major	3
+%define major	4
 %define libname	%mklibname %{name} %{major}
 
 Name:		%{name}
