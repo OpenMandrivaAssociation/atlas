@@ -121,7 +121,7 @@ to build a version tuned for your computer.
 
 #----###################################################################
 %package	-n lib%{name}-sse2-devel
-Summary:	Development files for ATLAS with SSE2 extensions
+Summary:	Development files for ATLAS SSE2 (Pentium IV)
 Group:		Development/Other
 Requires:	%{libname}-sse2 = %{version}-%{release}
 Provides:	lib%{name}-devel = %{version}-%{release}
@@ -222,7 +222,7 @@ Group:		Development/Other
 Requires:	%{libname}-x86_64 = %{version}-%{release}
 Provides:	lib%{name}-devel = %{version}-%{release}
 
-%description	lib%{name}-x86_64-devel
+%description	-n lib%{name}-x86_64-devel
 This package contains headers and development libraries of ATLAS
 (Automatically Tuned Linear Algebra Software) compiled with x86_64
 optimizations.
