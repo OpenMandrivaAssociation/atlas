@@ -69,7 +69,7 @@ optimizations.
 %doc doc/*
 %{_libdir}/atlas-custom/*.so
 %{_libdir}/atlas-custom/*.a
-%dir %{_includedir}/atlas-custom
+%dir %{_includedir}/atlas
 %{_includedir}/atlas/*.h
 %{_includedir}/cblas.h
 %{_includedir}/clapack.h
