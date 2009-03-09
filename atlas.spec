@@ -2,7 +2,7 @@
 # http://cvs.fedoraproject.org/viewvc/rpms/atlas/devel/atlas.spec?revision=1.21
 
 %define name	atlas
-%define major	4
+%define major	3
 %define libname	%mklibname %{name} %{major}
 
 Name:		%{name}
@@ -42,7 +42,6 @@ configuration.
 %package	-n %{libname}-custom
 Summary:	Custom ATLAS libraries
 Group:		Development/Other
-Obsoletes:	%mklibname %{name}-custom 3
 
 %description	-n %{libname}-custom
 This package contains the ATLAS (Automatically Tuned Linear Algebra
@@ -239,7 +238,6 @@ optimizations (Pentium IV).
 Summary:	ATLAS libraries for %{_arch}
 Group:		System/Libraries
 Provides:	%{libname} = %{version}-%{release}
-Obsoletes:	%mklibname %{name} 3
 
 %description	-n %{libname}-%{_arch}
 This package contains the ATLAS (Automatically Tuned Linear Algebra
