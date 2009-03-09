@@ -7,7 +7,7 @@
 
 Name:		%{name}
 Version:	3.8.3
-Release:	%mkrel 2
+Release:	%mkrel 3
 Summary:        Automatically Tuned Linear Algebra Software
 Group:          Sciences/Mathematics
 License:        BSD
@@ -35,13 +35,53 @@ The performance improvements in ATLAS are obtained largely via
 compile-time optimizations and tend to be specific to a given hardware
 configuration.
 
-
 ########################################################################
+%if "%{?enable_custom_atlas}" == "1"
+%define types	custom
+%define mode	%(gcc -dumpmachine | perl -e 'if (/^i.86-/) { print 32; } elsif (/[^-]+64-/) { print 64; } else { print 32; }')
+%package	-n %{libname}-custom
+Summary:	Custom ATLAS libraries
+Group:		Development/Other
+Obsoletes:	%mklibname %{name}-custom 3
+
+%description	-n %{libname}-custom
+This package contains the ATLAS (Automatically Tuned Linear Algebra
+Software) libraries compiled with custom optimizations.
+
+%files		-n %{libname}-custom
+%defattr(-,root,root,-)
+%dir %{_libdir}/atlas-custom
+%{_libdir}/atlas-custom/*.so.*
+%{_sysconfdir}/ld.so.conf.d/atlas-custom.conf
+
+%package	-n lib%{name}-custom-devel
+Summary:	Custom development files for ATLAS
+Group:		Development/Other
+Requires:	%{libname}-custom = %{version}-%{release}
+
+%description	-n lib%{name}-custom-devel
+This package contains headers and development libraries of ATLAS
+(Automatically Tuned Linear Algebra Software) compiled with custom
+optimizations.
+
+%files		-n lib%{name}-custom-devel
+%defattr(-,root,root,-)
+%doc doc/*
+%{_libdir}/atlas-custom/*.so
+%{_libdir}/atlas-custom/*.a
+%dir %{_includedir}/atlas-custom
+%{_includedir}/atlas/*.h
+%{_includedir}/cblas.h
+%{_includedir}/clapack.h
+
+%else	# enable_custom_atlas
+
+#--#####################################################################
 %ifarch %{ix86}
 %define types	sse sse2 sse3
 %define mode	32
 
-#--#####################################################################
+#----###################################################################
 %package	-n %{libname}-sse
 Summary:	ATLAS libraries for SSE extensions (Pentium III)
 Group:		System/Libraries
@@ -68,7 +108,7 @@ to build a version tuned for your computer.
 %{_libdir}/atlas-sse/*.so.*
 %{_sysconfdir}/ld.so.conf.d/atlas-sse.conf
 
-#----###################################################################
+#------#################################################################
 %package	-n lib%{name}-sse-devel
 Summary:	Development files for ATLAS SSE (Pentium III)
 Group:		Development/Other
@@ -92,7 +132,7 @@ optimizations (Pentium III).
 %{_includedir}/cblas.h
 %{_includedir}/clapack.h
 
-#--#####################################################################
+#----###################################################################
 %package	-n %{libname}-sse2
 Summary:	ATLAS libraries for SSE2 extensions (Pentium IV)
 Group:		System/Libraries
@@ -117,7 +157,7 @@ to build a version tuned for your computer.
 %{_libdir}/atlas/*.so.*
 %{_sysconfdir}/ld.so.conf.d/atlas.conf
 
-#----###################################################################
+#------#################################################################
 %package	-n lib%{name}-sse2-devel
 Summary:	Development files for ATLAS SSE2 (Pentium IV)
 Group:		Development/Other
@@ -139,7 +179,7 @@ optimizations (Pentium IV).
 %{_includedir}/cblas.h
 %{_includedir}/clapack.h
 
-#--#####################################################################
+#----###################################################################
 %package	-n %{libname}-sse3
 Summary:	ATLAS libraries for SSE3 extensions (Pentium IV)
 Group:		System/Libraries
@@ -162,7 +202,7 @@ to build a version tuned for your computer.
 %{_libdir}/atlas-sse3/*.so.*
 %{_sysconfdir}/ld.so.conf.d/atlas-sse3.conf
 
-#----###################################################################
+#------#################################################################
 %package	-n lib%{name}-sse3-devel
 Summary:	Development files for ATLAS SSE3 (Pentium IV)
 Group:		Development/Other
@@ -183,50 +223,55 @@ optimizations (Pentium IV).
 %{_includedir}/cblas.h
 %{_includedir}/clapack.h
 
-########################################################################
-%else
-%ifarch x86_64
-%define mode	64
-%define types	x86_64
-
 #--#####################################################################
-%package	-n %{libname}-x86_64
-Summary:	ATLAS libraries for x86_64
+%else
+
+%ifarch x86_64 ppc64
+%define mode	64
+%else
+%define mode	32
+%endif	# x86_64 ppc64
+
+%define types	%{_arch}
+
+#----###################################################################
+%package	-n %{libname}-%{_arch}
+Summary:	ATLAS libraries for %{_arch}
 Group:		System/Libraries
 Provides:	%{libname} = %{version}-%{release}
 Obsoletes:	%mklibname %{name} 3
 
-%description	-n %{libname}-x86_64
+%description	-n %{libname}-%{_arch}
 This package contains the ATLAS (Automatically Tuned Linear Algebra
-Software) libraries compiled with x86_64 optimizations.
+Software) libraries compiled with %{_arch} optimizations.
 This is a generic binary package. Install the "%{name}" package
 to build a version tuned for your computer.
 
 %if %mdkversion < 200900
-%post -n %{libname}-x86_64 -p /sbin/ldconfig
+%post -n %{libname}-%{_arch} -p /sbin/ldconfig
 
-%postun -n %{libname}-x86_64 -p /sbin/ldconfig
+%postun -n %{libname}-%{_arch} -p /sbin/ldconfig
 %endif
 
-%files		-n %{libname}-x86_64
+%files		-n %{libname}-%{_arch}
 %defattr(-,root,root,-)
 %dir %{_libdir}/atlas
 %{_libdir}/atlas/*.so.*
 %{_sysconfdir}/ld.so.conf.d/atlas.conf
 
-#----###################################################################
-%package	-n lib%{name}-x86_64-devel
-Summary:	Development files for ATLAS for x86_64
+#------#################################################################
+%package	-n lib%{name}-%{_arch}-devel
+Summary:	Development files for ATLAS for %{_arch}
 Group:		Development/Other
-Requires:	%{libname}-x86_64 = %{version}-%{release}
+Requires:	%{libname}-%{_arch} = %{version}-%{release}
 Provides:	lib%{name}-devel = %{version}-%{release}
 
-%description	-n lib%{name}-x86_64-devel
+%description	-n lib%{name}-%{_arch}-devel
 This package contains headers and development libraries of ATLAS
-(Automatically Tuned Linear Algebra Software) compiled with x86_64
+(Automatically Tuned Linear Algebra Software) compiled with %{_arch}
 optimizations.
 
-%files		-n lib%{name}-x86_64-devel
+%files		-n lib%{name}-%{_arch}-devel
 %defattr(-,root,root,-)
 %doc doc/*
 %{_libdir}/atlas/*.so
@@ -236,9 +281,8 @@ optimizations.
 %{_includedir}/cblas.h
 %{_includedir}/clapack.h
 
-%endif	# x86_64
 %endif	# ix86
-
+%endif	# enable_custom_atlas
 
 ########################################################################
 %prep
@@ -251,7 +295,7 @@ cp %{SOURCE1} %{SOURCE2} %{SOURCE3} doc
 %build
 for type in %{types}; do
     case $type in
-	sse2|x86_64)	libname=%{name}		;;
+	sse2|%{_arch})	libname=%{name}		;;
 	*)		libname=%{name}-$type	;;
     esac
     mkdir -p %{_arch}_${type}
@@ -282,7 +326,7 @@ done
 %install
 for type in %{types}; do
     case $type in
-	sse2|x86_64)	dirname=%{name}		;;
+	sse2|%{_arch})	dirname=%{name}		;;
 	*)		dirname=%{name}-$type	;;
     esac
     pushd %{_arch}_${type}
@@ -347,6 +391,11 @@ cat >  %{buildroot}%{_usrsrc}/ATLAS/README.mandriva << EOF
 
   The Makefile in this directory uses the same options as the
 precompiled atlas packages, and uses the same directory layout.
+
+
+  You may also prefer to have the files handled by rpm, in which
+case you need the source rpm, with which you can run:
+% rpmbuild -D "enable_custom_atlas 1" --rebuild atlas-%{version}-%{release}.src.rpm
 
 
   NOTES
