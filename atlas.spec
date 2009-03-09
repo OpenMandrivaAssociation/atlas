@@ -7,7 +7,7 @@
 
 Name:		%{name}
 Version:	3.8.3
-Release:	%mkrel 1
+Release:	%mkrel 2
 Summary:        Automatically Tuned Linear Algebra Software
 Group:          Sciences/Mathematics
 License:        BSD
@@ -46,7 +46,6 @@ configuration.
 Summary:	ATLAS libraries for SSE extensions (Pentium III)
 Group:		System/Libraries
 Obsoletes:	%{libname}-3dnow < 3.7
-Provides:	%{libname}-sse = %{version}-%{release}
 Obsoletes:	%mklibname %{name}3.0-sse
 Obsoletes:	%mklibname %{name}3.0-3dnow
 Obsoletes:	%mklibname %{name}%{major}-3dnow
@@ -98,7 +97,6 @@ optimizations (Pentium III).
 Summary:	ATLAS libraries for SSE2 extensions (Pentium IV)
 Group:		System/Libraries
 Obsoletes:	%mklibname %{name}3.0-sse2
-Provides:	%{libname}-sse2 = %{version}-%{release}
 Provides:	%{libname} = %{version}-%{release}
 
 %description	-n %{libname}-sse2
@@ -196,6 +194,7 @@ optimizations (Pentium IV).
 Summary:	ATLAS libraries for x86_64
 Group:		System/Libraries
 Provides:	%{libname} = %{version}-%{release}
+Obsoletes:	%mklibname %{name} 3
 
 %description	-n %{libname}-x86_64
 This package contains the ATLAS (Automatically Tuned Linear Algebra
@@ -260,7 +259,6 @@ for type in %{types}; do
 	../configure -b %{mode} -D c -DWALL -Fa alg			\
 	    '-Wa,--noexecstack -fPIC'					\
 	    -Ss f77lib `gfortran --print-file-name=libgfortran.so`	\
-	    -t 2							\
 	    --prefix=%{buildroot}%{_prefix}				\
 	    --incdir=%{buildroot}%{_includedir}				\
 	    --libdir=%{buildroot}%{_libdir}/${libname}			\
