@@ -1,13 +1,14 @@
 # Update from 3.6.0 to 3.8.3 is based on Fedora atlas package. See
 # http://cvs.fedoraproject.org/viewvc/rpms/atlas/devel/atlas.spec?revision=1.21
 
-%define name	atlas
-%define major	3
-%define libname	%mklibname %{name} %{major}
+%define name		atlas
+%define major		3
+%define libatlas	libatlas
+%define libname		%mklibname %{name} %{major}
 
 Name:		%{name}
 Version:	3.8.3
-Release:	%mkrel 3
+Release:	%mkrel 4
 Summary:        Automatically Tuned Linear Algebra Software
 Group:          Sciences/Mathematics
 License:        BSD
@@ -53,17 +54,17 @@ Software) libraries compiled with custom optimizations.
 %{_libdir}/atlas-custom/*.so.*
 %{_sysconfdir}/ld.so.conf.d/atlas-custom.conf
 
-%package	-n lib%{name}-custom-devel
+%package	-n %{libatlas}-custom-devel
 Summary:	Custom development files for ATLAS
 Group:		Development/Other
 Requires:	%{libname}-custom = %{version}-%{release}
 
-%description	-n lib%{name}-custom-devel
+%description	-n %{libatlas}-custom-devel
 This package contains headers and development libraries of ATLAS
 (Automatically Tuned Linear Algebra Software) compiled with custom
 optimizations.
 
-%files		-n lib%{name}-custom-devel
+%files		-n %{libatlas}-custom-devel
 %defattr(-,root,root,-)
 %doc doc/*
 %{_libdir}/atlas-custom/*.so
@@ -108,7 +109,7 @@ to build a version tuned for your computer.
 %{_sysconfdir}/ld.so.conf.d/atlas-sse.conf
 
 #------#################################################################
-%package	-n lib%{name}-sse-devel
+%package	-n %{libatlas}-sse-devel
 Summary:	Development files for ATLAS SSE (Pentium III)
 Group:		Development/Other
 Requires:	%{libname}-sse = %{version}-%{release}
@@ -116,12 +117,12 @@ Obsoletes:	%mklibname -d %{name}3.0-sse
 Obsoletes:	%mklibname -d %{name}3.0-3dnow
 Obsoletes:	%mklibname -d %{name}%{major}-3dnow
 
-%description	-n lib%{name}-sse-devel
+%description	-n %{libatlas}-sse-devel
 This package contains headers and development libraries of ATLAS
 (Automatically Tuned Linear Algebra Software) compiled with SSE
 optimizations (Pentium III).
 
-%files		-n lib%{name}-sse-devel
+%files		-n %{libatlas}-sse-devel
 %defattr(-,root,root,-)
 %doc doc/*
 %{_libdir}/atlas-sse/*.so
@@ -136,7 +137,7 @@ optimizations (Pentium III).
 Summary:	ATLAS libraries for SSE2 extensions (Pentium IV)
 Group:		System/Libraries
 Obsoletes:	%mklibname %{name}3.0-sse2
-Provides:	%{libname} = %{version}-%{release}
+Provides:	%{libatlas} = %{version}-%{release}
 
 %description	-n %{libname}-sse2
 This package contains the ATLAS (Automatically Tuned Linear Algebra
@@ -157,18 +158,18 @@ to build a version tuned for your computer.
 %{_sysconfdir}/ld.so.conf.d/atlas.conf
 
 #------#################################################################
-%package	-n lib%{name}-sse2-devel
+%package	-n %{libatlas}-sse2-devel
 Summary:	Development files for ATLAS SSE2 (Pentium IV)
 Group:		Development/Other
 Requires:	%{libname}-sse2 = %{version}-%{release}
-Provides:	lib%{name}-devel = %{version}-%{release}
+Provides:	%{libatlas}-devel = %{version}-%{release}
 
-%description	-n lib%{name}-sse2-devel
+%description	-n %{libatlas}-sse2-devel
 This package contains headers and development libraries of ATLAS
 (Automatically Tuned Linear Algebra Software) compiled with SSE2
 optimizations (Pentium IV).
 
-%files		-n lib%{name}-sse2-devel
+%files		-n %{libatlas}-sse2-devel
 %defattr(-,root,root,-)
 %doc doc/*
 %{_libdir}/atlas/*.so
@@ -202,17 +203,17 @@ to build a version tuned for your computer.
 %{_sysconfdir}/ld.so.conf.d/atlas-sse3.conf
 
 #------#################################################################
-%package	-n lib%{name}-sse3-devel
+%package	-n %{libatlas}-sse3-devel
 Summary:	Development files for ATLAS SSE3 (Pentium IV)
 Group:		Development/Other
 Requires:	%{libname}-sse3 = %{version}-%{release}
 
-%description	-n lib%{name}-sse3-devel
+%description	-n %{libatlas}-sse3-devel
 This package contains headers and development libraries of ATLAS
 (Automatically Tuned Linear Algebra Software) compiled with SSE3
 optimizations (Pentium IV).
 
-%files		-n lib%{name}-sse3-devel
+%files		-n %{libatlas}-sse3-devel
 %defattr(-,root,root,-)
 %doc doc/*
 %{_libdir}/atlas-sse3/*.so
@@ -237,7 +238,7 @@ optimizations (Pentium IV).
 %package	-n %{libname}-%{_arch}
 Summary:	ATLAS libraries for %{_arch}
 Group:		System/Libraries
-Provides:	%{libname} = %{version}-%{release}
+Provides:	%{libatlas} = %{version}-%{release}
 
 %description	-n %{libname}-%{_arch}
 This package contains the ATLAS (Automatically Tuned Linear Algebra
@@ -258,18 +259,18 @@ to build a version tuned for your computer.
 %{_sysconfdir}/ld.so.conf.d/atlas.conf
 
 #------#################################################################
-%package	-n lib%{name}-%{_arch}-devel
+%package	-n %{libatlas}-%{_arch}-devel
 Summary:	Development files for ATLAS for %{_arch}
 Group:		Development/Other
 Requires:	%{libname}-%{_arch} = %{version}-%{release}
-Provides:	lib%{name}-devel = %{version}-%{release}
+Provides:	%{libatlas}-devel = %{version}-%{release}
 
-%description	-n lib%{name}-%{_arch}-devel
+%description	-n %{libatlas}-%{_arch}-devel
 This package contains headers and development libraries of ATLAS
 (Automatically Tuned Linear Algebra Software) compiled with %{_arch}
 optimizations.
 
-%files		-n lib%{name}-%{_arch}-devel
+%files		-n %{libatlas}-%{_arch}-devel
 %defattr(-,root,root,-)
 %doc doc/*
 %{_libdir}/atlas/*.so
