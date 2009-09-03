@@ -1,5 +1,5 @@
 # Update from 3.6.0 to 3.8.3 is based on Fedora atlas package. See
-# http://cvs.fedoraproject.org/viewvc/rpms/atlas/devel/atlas.spec?revision=1.21
+# http://cvs.fedoraproject.org/viewvc/rpms/atlas/devel/atlas.spec?revision=1.23
 
 %define name		atlas
 %define major		3
@@ -8,7 +8,7 @@
 
 Name:		%{name}
 Version:	3.8.3
-Release:	%mkrel 4
+Release:	%mkrel 5
 Summary:        Automatically Tuned Linear Algebra Software
 Group:          Sciences/Mathematics
 License:        BSD
@@ -312,6 +312,7 @@ for type in %{types}; do
 	elif [ "$type" = "sse2" ]; then
 		sed -i 's#ARCH =.*#ARCH = P432SSE2#' Make.inc
 		sed -i 's#-DATL_SSE3##' Make.inc 
+		sed -i 's#-msse3#-msse2#' Make.inc
 	elif [ "$type" = "sse3" ]; then
 		sed -i 's#ARCH =.*#ARCH = P4E32SSE3#' Make.inc
 	fi
