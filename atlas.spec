@@ -8,7 +8,7 @@
 
 Name:		%{name}
 Version:	3.8.3
-Release:	%mkrel 5
+Release:	%mkrel 6
 Summary:        Automatically Tuned Linear Algebra Software
 Group:          Sciences/Mathematics
 License:        BSD
