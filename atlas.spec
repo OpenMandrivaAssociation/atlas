@@ -7,8 +7,8 @@
 %define libname		%mklibname %{name} %{major}
 
 Name:		%{name}
-Version:	3.8.3
-Release:	%mkrel 6
+Version:	3.8.4
+Release:	%mkrel 1
 Summary:        Automatically Tuned Linear Algebra Software
 Group:          Sciences/Mathematics
 License:        BSD
