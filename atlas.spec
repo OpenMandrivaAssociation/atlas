@@ -1,5 +1,7 @@
-# Update from 3.6.0 to 3.8.3 is based on Fedora atlas package. See
-# http://cvs.fedoraproject.org/viewvc/rpms/atlas/devel/atlas.spec?revision=1.23
+# Based on fedora package:
+# http://pkgs.fedoraproject.org/gitweb/?p=atlas.git;a=tree
+
+%bcond_with		custom_atlas
 
 %define name		atlas
 %define major		3
@@ -37,9 +39,9 @@ compile-time optimizations and tend to be specific to a given hardware
 configuration.
 
 ########################################################################
-%if "%{?enable_custom_atlas}" == "1"
+%if %{with custom_atlas}
 %define types	custom
-%define mode	%(gcc -dumpmachine | perl -e 'if (/^i.86-/) { print 32; } elsif (/[^-]+64-/) { print 64; } else { print 32; }')
+%define mode	%(gcc -dumpmachine | perl -e '$_ = <>; if (/^i.86-/) { print 32; } elsif (/[^-]+64-/) { print 64; } else { print 32; }')
 %package	-n %{libname}-custom
 Summary:	Custom ATLAS libraries
 Group:		Development/Other
@@ -74,13 +76,27 @@ optimizations.
 %{_includedir}/cblas.h
 %{_includedir}/clapack.h
 
-%else	# enable_custom_atlas
+########################################################################
+# with custom_atlas
+%else
+
+  %define mode		32
+  %define types		%{_arch}
+  %ifarch %{ix86}
+    %define types	sse sse2 sse3
+  %else
+    %ifarch x86_64
+      %define types	sse2 sse3
+      %define mode	64
+    %else
+      %ifarch ppc64
+        %define mode	64
+      %endif
+    %endif
+  %endif
 
 #--#####################################################################
-%ifarch %{ix86}
-%define types	sse sse2 sse3
-%define mode	32
-
+  %ifarch %{ix86}
 #----###################################################################
 %package	-n %{libname}-sse
 Summary:	ATLAS libraries for SSE extensions (Pentium III)
@@ -132,16 +148,21 @@ optimizations (Pentium III).
 %{_includedir}/cblas.h
 %{_includedir}/clapack.h
 
+# ifarch ix86
+  %endif
+
+#--#####################################################################
+  %ifarch %{ix86} x86_64
 #----###################################################################
 %package	-n %{libname}-sse2
-Summary:	ATLAS libraries for SSE2 extensions (Pentium IV)
+Summary:	ATLAS libraries for SSE2 extensions
 Group:		System/Libraries
 Obsoletes:	%mklibname %{name}3.0-sse2
 Provides:	%{libatlas} = %{version}-%{release}
 
 %description	-n %{libname}-sse2
 This package contains the ATLAS (Automatically Tuned Linear Algebra
-Software) libraries compiled with SSE2 optimizations (Pentium IV).
+Software) libraries compiled with SSE2 optimizations.
 This is a generic binary package. Install the "%{name}" package
 to build a version tuned for your computer.
 
@@ -159,7 +180,7 @@ to build a version tuned for your computer.
 
 #------#################################################################
 %package	-n %{libatlas}-sse2-devel
-Summary:	Development files for ATLAS SSE2 (Pentium IV)
+Summary:	Development files for ATLAS SSE2
 Group:		Development/Other
 Requires:	%{libname}-sse2 = %{version}-%{release}
 Provides:	%{libatlas}-devel = %{version}-%{release}
@@ -167,7 +188,7 @@ Provides:	%{libatlas}-devel = %{version}-%{release}
 %description	-n %{libatlas}-sse2-devel
 This package contains headers and development libraries of ATLAS
 (Automatically Tuned Linear Algebra Software) compiled with SSE2
-optimizations (Pentium IV).
+optimizations.
 
 %files		-n %{libatlas}-sse2-devel
 %defattr(-,root,root,-)
@@ -181,12 +202,12 @@ optimizations (Pentium IV).
 
 #----###################################################################
 %package	-n %{libname}-sse3
-Summary:	ATLAS libraries for SSE3 extensions (Pentium IV)
+Summary:	ATLAS libraries for SSE3 extensions
 Group:		System/Libraries
 
 %description	-n %{libname}-sse3
 This package contains the ATLAS (Automatically Tuned Linear Algebra
-Software) libraries compiled with SS3 optimizations (Pentium IV).
+Software) libraries compiled with SS3 optimizations.
 This is a generic binary package. Install the "%{name}" package
 to build a version tuned for your computer.
 
@@ -204,14 +225,14 @@ to build a version tuned for your computer.
 
 #------#################################################################
 %package	-n %{libatlas}-sse3-devel
-Summary:	Development files for ATLAS SSE3 (Pentium IV)
+Summary:	Development files for ATLAS SSE3
 Group:		Development/Other
 Requires:	%{libname}-sse3 = %{version}-%{release}
 
 %description	-n %{libatlas}-sse3-devel
 This package contains headers and development libraries of ATLAS
 (Automatically Tuned Linear Algebra Software) compiled with SSE3
-optimizations (Pentium IV).
+optimizations.
 
 %files		-n %{libatlas}-sse3-devel
 %defattr(-,root,root,-)
@@ -223,17 +244,11 @@ optimizations (Pentium IV).
 %{_includedir}/cblas.h
 %{_includedir}/clapack.h
 
+# ifarch ix86 x86_64
+  %endif
+
 #--#####################################################################
-%else
-
-%ifarch x86_64 ppc64
-%define mode	64
-%else
-%define mode	32
-%endif	# x86_64 ppc64
-
-%define types	%{_arch}
-
+  %ifnarch %{ix86} x86_64
 #----###################################################################
 %package	-n %{libname}-%{_arch}
 Summary:	ATLAS libraries for %{_arch}
@@ -280,8 +295,10 @@ optimizations.
 %{_includedir}/cblas.h
 %{_includedir}/clapack.h
 
-%endif	# ix86
-%endif	# enable_custom_atlas
+# ifnarch ix86 x86_64
+  %endif
+# enable_custom_atlas
+%endif
 
 ########################################################################
 %prep
@@ -310,11 +327,23 @@ for type in %{types}; do
 		sed -i 's#ARCH =.*#ARCH = PIII32SSE1#' Make.inc
 		sed -i 's#-DATL_SSE3 -DATL_SSE2##' Make.inc 
 	elif [ "$type" = "sse2" ]; then
+%ifarch %{ix86}
 		sed -i 's#ARCH =.*#ARCH = P432SSE2#' Make.inc
 		sed -i 's#-DATL_SSE3##' Make.inc 
 		sed -i 's#-msse3#-msse2#' Make.inc
+%endif
+%ifarch x86_64
+		sed -i 's#ARCH =.*#ARCH = HAMMER64SSE2#' Make.inc
+		sed -i 's#-DATL_SSE3##' Make.inc 
+		sed -i 's#-msse3#-msse2#' Make.inc
+%endif
 	elif [ "$type" = "sse3" ]; then
+%ifarch %{ix86}
 		sed -i 's#ARCH =.*#ARCH = P4E32SSE3#' Make.inc
+%endif
+%ifarch x86_64
+		sed -i 's#ARCH =.*#ARCH = HAMMER64SSE3#' Make.inc
+%endif
 	fi
 	make build
 	cd lib
@@ -395,7 +424,7 @@ precompiled atlas packages, and uses the same directory layout.
 
   You may also prefer to have the files handled by rpm, in which
 case you need the source rpm, with which you can run:
-% rpmbuild -D "enable_custom_atlas 1" --rebuild atlas-%{version}-%{release}.src.rpm
+% rpmbuild --with custom_atlas --rebuild atlas-%{version}-%{release}.src.rpm
 
 
   NOTES
