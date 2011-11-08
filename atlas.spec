@@ -312,7 +312,6 @@ optimizations.
 cp %{SOURCE1} %{SOURCE2} %{SOURCE3} doc
 
 %build
-export CFLAGS="%{optflags} -DREPS=4096"
 for type in %{types}; do
     case $type in
 	sse2|%{_arch})	libname=%{name}		;;
