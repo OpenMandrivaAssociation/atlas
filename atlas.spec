@@ -2,6 +2,7 @@
 # http://pkgs.fedoraproject.org/gitweb/?p=atlas.git;a=tree
 
 %bcond_with		custom_atlas
+%bcond_with		atlas_liblapack
 
 %define name		atlas
 %define major		3
@@ -10,7 +11,7 @@
 
 Name:		%{name}
 Version:	3.8.4
-Release:	%mkrel 1
+Release:	%mkrel 2
 Summary:        Automatically Tuned Linear Algebra Software
 Group:          Sciences/Mathematics
 License:        BSD
@@ -204,6 +205,7 @@ optimizations.
 %package	-n %{libname}-sse3
 Summary:	ATLAS libraries for SSE3 extensions
 Group:		System/Libraries
+Provides:	%{libatlas} = %{version}-%{release}
 
 %description	-n %{libname}-sse3
 This package contains the ATLAS (Automatically Tuned Linear Algebra
@@ -228,6 +230,7 @@ to build a version tuned for your computer.
 Summary:	Development files for ATLAS SSE3
 Group:		Development/Other
 Requires:	%{libname}-sse3 = %{version}-%{release}
+Provides:	%{libatlas}-devel = %{version}-%{release}
 
 %description	-n %{libatlas}-sse3-devel
 This package contains headers and development libraries of ATLAS
@@ -362,6 +365,9 @@ for type in %{types}; do
 	make DESTDIR=%{buildroot} install || :
 	mkdir -p %{buildroot}%{_libdir}/${dirname}
 	cp -pr lib/*.so* %{buildroot}%{_libdir}/${dirname}/
+%if %{without atlas_liblapack}
+	rm -f %{buildroot}%{_libdir}/${dirname}/liblapack.so*
+%endif
     popd
     mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d
     echo "%{_libdir}/${dirname}"				\
@@ -400,6 +406,9 @@ install:
 	(cd %{_arch} && (make install || :) &&				\
 	cp -pr lib/*.so* %{_libdir}/%{name} &&				\
 	echo "%{_libdir}/%{name}" > %{_sysconfdir}/ld.so.conf.d/%{name}.conf)
+%if %{without atlas_liblapack}
+	rm -f %{buildroot}%{_libdir}/${dirname}/liblapack.so*
+%endif
 
 uninstall:
 	rm -fr %{_libdir}/%{name}/*
