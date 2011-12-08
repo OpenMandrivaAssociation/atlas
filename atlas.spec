@@ -167,7 +167,6 @@ fi
 %package	-n %{libname}-sse
 Summary:	ATLAS libraries for SSE extensions (Pentium III)
 Group:		System/Libraries
-Obsoletes:	%{libname}-3dnow < 3.7
 Obsoletes:	%mklibname %{name}3.0-sse
 Obsoletes:	%mklibname %{name}3.0-3dnow
 Obsoletes:	%mklibname %{name}%{major}-3dnow
