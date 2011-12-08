@@ -474,7 +474,8 @@ fi
 cp %{SOURCE1} %{SOURCE2} %{SOURCE3} doc
 
 %build
-for type in %{types}; do
+function build {
+    type=$1
     case $type in
 	%{_arch})	libname=%{name}		;;
 	*)		libname=%{name}-$type	;;
@@ -515,6 +516,16 @@ for type in %{types}; do
 	make shared
 	make ptshared
     popd
+}
+
+for type in %{types}; do
+    for try in 1 2 3 4 5 6 7 8 9 10; do
+	build $type
+	if test $? != 0; then
+	    break
+	fi
+    done
+    [ $? != 0 ] && exit 1
 done
 
 %install
