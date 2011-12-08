@@ -96,10 +96,12 @@ Software) libraries compiled with custom optimizations.
 update-alternatives							\
     --install %{_libdir}/atlas atlas %{_libdir}/atlas-custom 4		\
     --slave %{_sysconfdir}/ld.so.conf.d/atlas.conf atlas-conf %{_libdir}/atlas-custom/atlas.conf
+/sbin/ldconfig
 
 %postun		-n %{libname}-custom
 if [ $1 -eq 0 ]; then
     update-alternatives --remove atlas %{_libdir}/atlas-custom
+    /sbin/ldconfig
 fi
 
 %files		-n %{libname}-custom
@@ -125,10 +127,12 @@ update-alternatives							\
     --install %{_includedir}/atlas atlas-devel %{_includedir}/atlas-custom 4 \
     --slave %{_includedir}/cblas.h cblas.h %{_includedir}/atlas-custom/cblas.h \
     --slave %{_includedir}/clapack.h clapack.h %{_includedir}/atlas-custom/clapack.h
+/sbin/ldconfig
 
 %postun		-n %{libatlas}-custom-devel
 if [ $1 -eq 0 ]; then
     update-alternatives --remove atlas-devel %{_includedir}/atlas-custom
+    /sbin/ldconfig
 fi
 
 %files		-n %{libatlas}-custom-devel
@@ -186,10 +190,12 @@ to build a version tuned for your computer.
 update-alternatives							\
     --install %{_libdir}/atlas atlas %{_libdir}/atlas-sse 1		\
     --slave %{_sysconfdir}/ld.so.conf.d/atlas.conf atlas-conf %{_libdir}/atlas-sse/atlas.conf
+/sbin/ldconfig
 
 %postun		-n %{libname}-sse
 if [ $1 -eq 0 ]; then
     update-alternatives --remove atlas %{_libdir}/atlas-sse
+    /sbin/ldconfig
 fi
 
 %files		-n %{libname}-sse
@@ -219,10 +225,12 @@ update-alternatives							\
     --install %{_includedir}/atlas atlas-devel %{_includedir}/atlas-sse 1 \
     --slave %{_includedir}/cblas.h cblas.h %{_includedir}/atlas-sse/cblas.h \
     --slave %{_includedir}/clapack.h clapack.h %{_includedir}/atlas-sse/clapack.h
+/sbin/ldconfig
 
 %postun		-n %{libatlas}-sse-devel
 if [ $1 -eq 0 ]; then
     update-alternatives --remove atlas-devel %{_includedir}/atlas-sse
+    /sbin/ldconfig
 fi
 
 %files		-n %{libatlas}-sse-devel
@@ -270,10 +278,12 @@ to build a version tuned for your computer.
 update-alternatives							\
     --install %{_libdir}/atlas atlas %{_libdir}/atlas-sse2 2		\
     --slave %{_sysconfdir}/ld.so.conf.d/atlas.conf atlas-conf %{_libdir}/atlas-sse2/atlas.conf
+/sbin/ldconfig
 
 %postun		-n %{libname}-sse2
 if [ $1 -eq 0 ]; then
     update-alternatives --remove atlas %{_libdir}/atlas-sse2
+    /sbin/ldconfig
 fi
 
 %files		-n %{libname}-sse2
@@ -304,10 +314,12 @@ update-alternatives							\
     --install %{_includedir}/atlas atlas-devel %{_includedir}/atlas-sse2 2 \
     --slave %{_includedir}/cblas.h cblas.h %{_includedir}/atlas-sse2/cblas.h \
     --slave %{_includedir}/clapack.h clapack.h %{_includedir}/atlas-sse2/clapack.h
+    /sbin/ldconfig
 
 %postun		-n %{libatlas}-sse2-devel
 if [ $1 -eq 0 ]; then
     update-alternatives --remove atlas-devel %{_includedir}/atlas-sse2
+    /sbin/ldconfig
 fi
 
 %files		-n %{libatlas}-sse2-devel
@@ -349,10 +361,12 @@ to build a version tuned for your computer.
 update-alternatives							\
     --install %{_libdir}/atlas atlas %{_libdir}/atlas-sse3 3		\
     --slave %{_sysconfdir}/ld.so.conf.d/atlas.conf atlas-conf %{_libdir}/atlas-sse3/atlas.conf
+/sbin/ldconfig
 
 %postun		-n %{libname}-sse3
 if [ $1 -eq 0 ]; then
     update-alternatives --remove atlas %{_libdir}/atlas-sse3
+    /sbin/ldconfig
 fi
 
 %files		-n %{libname}-sse3
@@ -423,10 +437,12 @@ to build a version tuned for your computer.
 update-alternatives							\
     --install %{_libdir}/atlas atlas %{_libdir}/atlas-%{_arch} 2	\
     --slave %{_sysconfdir}/ld.so.conf.d/atlas.conf atlas-conf %{_libdir}/atlas-%{_arch}/atlas.conf
+/sbin/ldconfig
 
 %postun		-n %{libname}-%{_arch}
 if [ $1 -eq 0 ]; then
     update-alternatives --remove atlas %{_libdir}/atlas-%{_arch}
+/sbin/ldconfig
 fi
 
 %files		-n %{libname}-%{_arch}
@@ -454,10 +470,12 @@ update-alternatives							\
     --install %{_includedir}/atlas atlas-devel %{_includedir}/atlas-%{_arch} 2 \
     --slave %{_includedir}/cblas.h cblas.h %{_includedir}/atlas-%{_arch}/cblas.h \
     --slave %{_includedir}/clapack.h clapack.h %{_includedir}/atlas-%{_arch}/clapack.h
+/sbin/ldconfig
 
 %postun		-n %{libatlas}-%{_arch}-devel
 if [ $1 -eq 0 ]; then
     update-alternatives --remove atlas-devel %{_includedir}/atlas-%{_arch}
+    /sbin/ldconfig
 fi
 
 %files		-n %{libatlas}-%{_arch}-devel
