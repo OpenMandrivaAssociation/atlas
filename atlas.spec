@@ -511,21 +511,22 @@ function build {
 		sed -i 's#ARCH =.*#ARCH = HAMMER64SSE3#' Make.inc
 %endif
 	fi
-	make build
+	(make build || echo -n 1) && return 0
 	cd lib
-	make shared
-	make ptshared
+	(make shared || echo -n 1) && return 0
+	(make ptshared || echo -n 1) && return 0
     popd
+    echo -n 0
 }
 
 for type in %{types}; do
     for try in 1 2 3 4 5 6 7 8 9 10; do
-	build $type
-	if test $? != 0; then
+	result=`build $type`
+	if test $result = 0; then
 	    break
 	fi
     done
-    [ $? != 0 ] && exit 1
+    [ $result != 0 ] && exit 1
 done
 
 %install
