@@ -322,6 +322,9 @@ fi
 Summary:	ATLAS libraries for SSE3 extensions
 Group:		System/Libraries
 Provides:	%{libatlas} = %{version}-%{release}
+%ifarch x86_64
+Obsoletes:	%{libname}-x86_64
+%endif
 Conflicts:	%{libname}-custom < %{version}-%{release}
 Conflicts:	%{libatlas}-custom-devel < %{version}-%{release}
 %ifnarch x86_64
@@ -362,6 +365,9 @@ fi
 %package	-n %{libatlas}-sse3-devel
 Summary:	Development files for ATLAS SSE3
 Group:		Development/Other
+%ifarch x86_64
+Obsoletes:	%{libatlas}-x86_64-devel
+%endif
 Requires:	%{libname}-sse3 = %{version}-%{release}
 Provides:	%{libatlas}-devel = %{version}-%{release}
 Requires(post):	update-alternatives
