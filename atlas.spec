@@ -558,18 +558,18 @@ function build {
 		sed -i 's#ARCH =.*#ARCH = HAMMER64SSE3#' Make.inc
 %endif
 	fi
-	make build > /dev/null
+	make build
 	if test $? != 0; then
 		echo -n 1 > $RESULT
 		return 0
 	fi
 	cd lib
-	make shared > /dev/null
+	make shared
 	if test $? != 0; then
 		echo -n 1 > $RESULT
 		return 0
 	fi
-	make ptshared > /dev/null
+	make ptshared
 	if test $? != 0; then
 		echo -n 1 > $RESULT
 		return 0
