@@ -592,7 +592,6 @@ done
 rm -f $RESULT
 
 %install
-mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d
 for type in %{types}; do
     dirname=%{name}-$type
     pushd %{_arch}_${type}
@@ -615,15 +614,15 @@ pushd %{buildroot}%{_usrsrc}/ATLAS
 popd
 
 install -D %{SOURCE4} %{buildroot}%{_usrsrc}/ATLAS/Makefile
-perl -pi -e 's|@@LIBDIR@@|%{_libdir}|g;'				\
-	 -e 's|@@ARCH@@|%{_arch}|g;'					\
-	 -e 's|@@MODE@@|%{mode}|g;'					\
+perl -pi -e 's|\@\@LIBDIR\@\@|%{_libdir}|g;'				\
+	 -e 's|\@\@ARCH\@\@|%{_arch}|g;'				\
+	 -e 's|\@\@MODE\@\@|%{mode}|g;'					\
 	%{buildroot}%{_usrsrc}/ATLAS/Makefile
 
 install -D %{SOURCE5} %{buildroot}%{_usrsrc}/ATLAS/README.mandriva
-perl -pi -e 's|@@VERSION@@|%{version}|g;'				\
-	 -e 's|@@RELEASE@@|%{release}|g;'				\
-	 -e 's|@@ARCH@@|%{_arch}|g;'					\
+perl -pi -e 's|\@\@VERSION\@\@|%{version}|g;'				\
+	 -e 's|\@\@RELEASE\@\@|%{release}|g;'				\
+	 -e 's|\@\@ARCH\@\@|%{_arch}|g;'				\
 	%{buildroot}%{_usrsrc}/ATLAS/README.mandriva
 
 %clean
