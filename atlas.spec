@@ -501,13 +501,20 @@ cp %{SOURCE1} %{SOURCE2} %{SOURCE3} doc
 mkdir temp
 pushd temp
     ar x %{_libdir}/liblapack.a
-    rm -f cgesv.f.o cgetrf.o cgetri.o cgetrs.o clauum.o cposv.o		\
-	  cpotrf.o cpotri.o cpotrs.o ctrtri.o dgesv.o dgetrf.o		\
-	  dgetri.o dgetrs.o dlauum.o dposv.o dpotrf.o dpotri.o		\
-	  dpotrs.o dtrtri.o ieeeck.o ilaenv.o sgesv.o sgetrf.o		\
-	  sgetri.o sgetrs.o slauum.o sposv.o spotrf.o spotri.o		\
-	  spotrs.o strtri.o zgesv.o zgetrf.o zgetri.o zgetrs.o		\
-	  zlauum.o zposv.o zpotrf.o zpotri.o zpotrs.o ztrtri.o
+    rm -f cgesv.f.o cgetrf.o cgetrf.f.o cgetri.o cgetri.f.o		\
+	  cgetrs.o cgetrs.f.o clauum.o clauum.f.o cposv.o cposv.f.o	\
+	  cpotrf.o cpotrf.f.o cpotri.o cpotri.f.o cpotrs.o cpotrs.f.o	\
+	  ctrtri.o ctrtri.f.o dgesv.o dgesv.f.o dgetrf.o dgetrf.f.o	\
+	  dgetri.o dgetri.f.o dgetrs.o dgetrs.f.o dlauum.o dlauum.f.o	\
+	  dposv.o dposv.f.o dpotrf.o dpotrf.f.o dpotri.o dpotri.f.o	\
+	  dpotrs.o dpotrs.f.o dtrtri.o dtrtri.f.o ieeeck.o ieeeck.f.o	\
+	  ilaenv.o ilaenv.f.o sgesv.o sgesv.f.o sgetrf.o sgetrf.f.o	\
+	  sgetri.o sgetri.f.o sgetrs.o sgetrs.f.o slauum.o slauum.f.o	\
+	  sposv.o sposv.f.o spotrf.o spotrf.f.o spotri.o spotri.f.o	\
+	  spotrs.o spotrs.f.o strtri.o strtri.f.o zgesv.o zgesv.f.o	\
+	  zgetrf.o zgetrf.f.o zgetri.o  zgetri.f.o zgetrs.o zgetrs.f.o	\
+	  zlauum.o zlauum.f.o zposv.o zposv.f.o zpotrf.o zpotrf.f.o	\
+	  zpotri.o zpotri.f.o zpotrs.o zpotrs.f.o ztrtri.o ztrtri.f.o
     ar q ../liblapack.a *.o
 popd
 rm -fr temp
