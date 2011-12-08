@@ -2,7 +2,6 @@
 # http://pkgs.fedoraproject.org/gitweb/?p=atlas.git;a=tree
 
 %bcond_with		custom_atlas
-%bcond_with		atlas_liblapack
 
 %define name		atlas
 %define major		3
@@ -46,7 +45,9 @@ Requires(post):	update-alternatives
 Requires(postun): update-alternatives
 
 Requires:	gcc-gfortran liblapack-devel make
-BuildRequires:	gcc-gfortran liblapack-devel
+BuildRequires:	gcc-gfortran
+# ensure it has a pic liblapack.a
+BuildRequires:	lapack-devel > 3.3.1-1
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -473,7 +474,22 @@ fi
 
 cp %{SOURCE1} %{SOURCE2} %{SOURCE3} doc
 
+mkdir temp
+pushd temp
+    ar x %{_libdir}/liblapack.a
+    rm -f cgesv.f.o cgetrf.o cgetri.o cgetrs.o clauum.o cposv.o		\
+	  cpotrf.o cpotri.o cpotrs.o ctrtri.o dgesv.o dgetrf.o		\
+	  dgetri.o dgetrs.o dlauum.o dposv.o dpotrf.o dpotri.o		\
+	  dpotrs.o dtrtri.o ieeeck.o ilaenv.o sgesv.o sgetrf.o		\
+	  sgetri.o sgetrs.o slauum.o sposv.o spotrf.o spotri.o		\
+	  spotrs.o strtri.o zgesv.o zgetrf.o zgetri.o zgetrs.o		\
+	  zlauum.o zposv.o zpotrf.o zpotri.o zpotrs.o ztrtri.o
+    ar q ../liblapack.a
+popd
+rm -fr temp
+
 %build
+RESULT=`mktemp $TMPDIR/atlasXXXXXX`
 function build {
     type=$1
     case $type in
@@ -489,7 +505,7 @@ function build {
 	    --prefix=%{buildroot}%{_prefix}				\
 	    --incdir=%{buildroot}%{_includedir}				\
 	    --libdir=%{buildroot}%{_libdir}/${libname}			\
-	    --with-netlib-lapack=%{_libdir}/liblapack_pic.a
+	    --with-netlib-lapack=%{_builddir}/ATLAS/liblapack.a
 	if [ "$type" = "sse" ]; then
 		sed -i 's#ARCH =.*#ARCH = PIII32SSE1#' Make.inc
 		sed -i 's#-DATL_SSE3 -DATL_SSE2##' Make.inc 
@@ -512,23 +528,37 @@ function build {
 		sed -i 's#ARCH =.*#ARCH = HAMMER64SSE3#' Make.inc
 %endif
 	fi
-	(make build || echo -n 1) && return 0
+	make build > /dev/null
+	if test $? != 0; then
+		echo -n 1 > $RESULT
+		return 0
+	fi
 	cd lib
-	(make shared || echo -n 1) && return 0
-	(make ptshared || echo -n 1) && return 0
+	make shared > /dev/null
+	if test $? != 0; then
+		echo -n 1 > $RESULT
+		return 0
+	fi
+	make ptshared > /dev/null
+	if test $? != 0; then
+		echo -n 1 > $RESULT
+		return 0
+	fi
     popd
-    echo -n 0
+    echo -n 0 > $RESULT
 }
 
 for type in %{types}; do
     for try in 1 2 3 4 5 6 7 8 9 10; do
-	result=`build $type`
+	build $type
+	result=`cat $RESULT`
 	if test $result = 0; then
 	    break
 	fi
     done
     [ $result != 0 ] && exit 1
 done
+rm -f $RESULT
 
 %install
 mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d
@@ -538,9 +568,6 @@ for type in %{types}; do
 	make DESTDIR=%{buildroot} install || :
 	mkdir -p %{buildroot}%{_libdir}/${dirname}
 	cp -pr lib/*.so* %{buildroot}%{_libdir}/${dirname}/
-%if %{without atlas_liblapack}
-	rm -f %{buildroot}%{_libdir}/${dirname}/liblapack.so*
-%endif
 	mv %{buildroot}%{_includedir}/atlas %{buildroot}%{_includedir}/${dirname}
 	mv %{buildroot}%{_includedir}/*.h %{buildroot}%{_includedir}/${dirname}
     popd
@@ -560,11 +587,6 @@ install -D %{SOURCE4} %{buildroot}%{_usrsrc}/ATLAS/Makefile
 perl -pi -e 's|@@LIBDIR@@|%{_libdir}|g;'				\
 	 -e 's|@@ARCH@@|%{_arch}|g;'					\
 	 -e 's|@@MODE@@|%{mode}|g;'					\
-%if %{without atlas_liblapack}
-	-e 's|@@LAPACK@@||;'						\
-%else
-	-e 's|@@LAPACK@@|#|;'						\
-%endif
 	%{buildroot}%{_usrsrc}/ATLAS/Makefile
 
 install -D %{SOURCE5} %{buildroot}%{_usrsrc}/ATLAS/README.mandriva
