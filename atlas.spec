@@ -11,7 +11,7 @@
 
 Name:		%{name}
 Version:	3.8.4
-Release:	%mkrel 2
+Release:	%mkrel 3
 Summary:        Automatically Tuned Linear Algebra Software
 Group:          Sciences/Mathematics
 License:        BSD
@@ -20,8 +20,30 @@ Source0:	http://downloads.sourceforge.net/math-atlas/atlas%{version}.tar.bz2
 Source1:	http://math-atlas.sourceforge.net/errata.html
 Source2:	http://math-atlas.sourceforge.net/faq.html
 Source3:	http://www.cs.utsa.edu/~whaley/papers.html
+Source4:	Makefile
+Source5:	README.mandriva
 
 Patch0:		atlas-fedora_shared.patch
+
+Conflicts:	%{libname}-custom < %{version}-%{release}
+Conflicts:	%{libatlas}-custom-devel < %{version}-%{release}
+%ifarch %{ix86}
+Conflicts:	%{libname}-sse < %{version}-%{release}
+Conflicts:	%{libatlas}-sse-devel < %{version}-%{release}
+%endif
+%ifarch %{ix86} x86_64
+Conflicts:	%{libname}-sse2 < %{version}-%{release}
+Conflicts:	%{libatlas}-sse2-devel < %{version}-%{release}
+Conflicts:	%{libname}-sse3 < %{version}-%{release}
+Conflicts:	%{libatlas}-sse3-devel < %{version}-%{release}
+%endif
+%ifnarch %{ix86} x86_64
+Conflicts:	%{libname}-%{_arch} < %{version}-%{release}
+Conflicts:	%{libatlas}-%{_arch}-devel < %{version}-%{release}
+%endif
+
+Requires(post):	update-alternatives
+Requires(postun): update-alternatives
 
 Requires:	gcc-gfortran liblapack-devel make
 BuildRequires:	gcc-gfortran liblapack-devel
@@ -46,36 +68,74 @@ configuration.
 %package	-n %{libname}-custom
 Summary:	Custom ATLAS libraries
 Group:		Development/Other
+Conflicts:	%{libatlas}-custom-devel < %{version}-%{release}
+%ifarch %{ix86}
+Conflicts:	%{libname}-sse < %{version}-%{release}
+Conflicts:	%{libatlas}-sse-devel < %{version}-%{release}
+%endif
+%ifarch %{ix86} x86_64
+Conflicts:	%{libname}-sse2 < %{version}-%{release}
+Conflicts:	%{libatlas}-sse2-devel < %{version}-%{release}
+Conflicts:	%{libname}-sse3 < %{version}-%{release}
+Conflicts:	%{libatlas}-sse3-devel < %{version}-%{release}
+%endif
+%ifnarch %{ix86} x86_64
+Conflicts:	%{libname}-%{_arch} < %{version}-%{release}
+Conflicts:	%{libatlas}-%{_arch}-devel < %{version}-%{release}
+%endif
+Conflicts:	atlas < %{version}-%{release}
+Requires(post):	update-alternatives
+Requires(postun): update-alternatives
 
 %description	-n %{libname}-custom
 This package contains the ATLAS (Automatically Tuned Linear Algebra
 Software) libraries compiled with custom optimizations.
 
+%posttrans	-n %{libname}-custom
+update-alternatives							\
+    --install %{_libdir}/atlas atlas %{_libdir}/atlas-custom 4		\
+    --slave %{_sysconfdir}/ld.so.conf.d/atlas.conf atlas-conf %{_libdir}/atlas-custom/atlas.conf
+
+%postun		-n %{libname}-custom
+if [ $1 -eq 0 ]; then
+    update-alternatives --remove atlas %{_libdir}/atlas-custom
+fi
+
 %files		-n %{libname}-custom
 %defattr(-,root,root,-)
 %dir %{_libdir}/atlas-custom
 %{_libdir}/atlas-custom/*.so.*
-%{_sysconfdir}/ld.so.conf.d/atlas-custom.conf
+%{_libdir}/atlas-custom/atlas.conf
 
 %package	-n %{libatlas}-custom-devel
 Summary:	Custom development files for ATLAS
 Group:		Development/Other
 Requires:	%{libname}-custom = %{version}-%{release}
+Requires(post):	update-alternatives
+Requires(postun): update-alternatives
 
 %description	-n %{libatlas}-custom-devel
 This package contains headers and development libraries of ATLAS
 (Automatically Tuned Linear Algebra Software) compiled with custom
 optimizations.
 
+%posttrans	-n %{libatlas}-custom-devel
+update-alternatives							\
+    --install %{_includedir}/atlas atlas-devel %{_includedir}/atlas-custom 4 \
+    --slave %{_includedir}/cblas.h cblas.h %{_includedir}/atlas-custom/cblas.h \
+    --slave %{_includedir}/clapack.h clapack.h %{_includedir}/atlas-custom/clapack.h
+
+%postun		-n %{libatlas}-custom-devel
+if [ $1 -eq 0 ]; then
+    update-alternatives --remove atlas-devel %{_includedir}/atlas-custom
+fi
+
 %files		-n %{libatlas}-custom-devel
 %defattr(-,root,root,-)
 %doc doc/*
-%{_libdir}/atlas-custom/*.so
 %{_libdir}/atlas-custom/*.a
-%dir %{_includedir}/atlas
-%{_includedir}/atlas/*.h
-%{_includedir}/cblas.h
-%{_includedir}/clapack.h
+%{_libdir}/atlas-custom/*.so
+%{_includedir}/atlas-custom/
 
 ########################################################################
 # with custom_atlas
@@ -106,6 +166,14 @@ Obsoletes:	%{libname}-3dnow < 3.7
 Obsoletes:	%mklibname %{name}3.0-sse
 Obsoletes:	%mklibname %{name}3.0-3dnow
 Obsoletes:	%mklibname %{name}%{major}-3dnow
+Conflicts:	%{libname}-custom < %{version}-%{release}
+Conflicts:	%{libatlas}-custom-devel < %{version}-%{release}
+Conflicts:	%{libatlas}-sse-devel < %{version}-%{release}
+Conflicts:	%{libname}-sse2 < %{version}-%{release}
+Conflicts:	%{libatlas}-sse2-devel < %{version}-%{release}
+Conflicts:	atlas < %{version}-%{release}
+Requires(post):	update-alternatives
+Requires(postun): update-alternatives
 
 %description	-n %{libname}-sse
 This package contains the ATLAS (Automatically Tuned Linear Algebra
@@ -113,17 +181,21 @@ Software) libraries compiled with SSE optimizations (Pentium III).
 This is a generic binary package. Install the "%{name}" package
 to build a version tuned for your computer.
 
-%if %mdkversion < 200900
-%post -n %{libname}-sse -p /sbin/ldconfig
+%posttrans	-n %{libname}-sse
+update-alternatives							\
+    --install %{_libdir}/atlas atlas %{_libdir}/atlas-sse 1		\
+    --slave %{_sysconfdir}/ld.so.conf.d/atlas.conf atlas-conf %{_libdir}/atlas-sse/atlas.conf
 
-%postun -n %{libname}-sse -p /sbin/ldconfig
-%endif
+%postun		-n %{libname}-sse
+if [ $1 -eq 0 ]; then
+    update-alternatives --remove atlas %{_libdir}/atlas-sse
+fi
 
 %files		-n %{libname}-sse
 %defattr(-,root,root,-)
 %dir %{_libdir}/atlas-sse
 %{_libdir}/atlas-sse/*.so.*
-%{_sysconfdir}/ld.so.conf.d/atlas-sse.conf
+%{_libdir}/atlas-sse/atlas.conf
 
 #------#################################################################
 %package	-n %{libatlas}-sse-devel
@@ -133,21 +205,31 @@ Requires:	%{libname}-sse = %{version}-%{release}
 Obsoletes:	%mklibname -d %{name}3.0-sse
 Obsoletes:	%mklibname -d %{name}3.0-3dnow
 Obsoletes:	%mklibname -d %{name}%{major}-3dnow
+Requires(post):	update-alternatives
+Requires(postun): update-alternatives
 
 %description	-n %{libatlas}-sse-devel
 This package contains headers and development libraries of ATLAS
 (Automatically Tuned Linear Algebra Software) compiled with SSE
 optimizations (Pentium III).
 
+%posttrans	-n %{libatlas}-sse-devel
+update-alternatives							\
+    --install %{_includedir}/atlas atlas-devel %{_includedir}/atlas-sse 1 \
+    --slave %{_includedir}/cblas.h cblas.h %{_includedir}/atlas-sse/cblas.h \
+    --slave %{_includedir}/clapack.h clapack.h %{_includedir}/atlas-sse/clapack.h
+
+%postun		-n %{libatlas}-sse-devel
+if [ $1 -eq 0 ]; then
+    update-alternatives --remove atlas-devel %{_includedir}/atlas-sse
+fi
+
 %files		-n %{libatlas}-sse-devel
 %defattr(-,root,root,-)
 %doc doc/*
-%{_libdir}/atlas-sse/*.so
 %{_libdir}/atlas-sse/*.a
-%dir %{_includedir}/atlas
-%{_includedir}/atlas/*.h
-%{_includedir}/cblas.h
-%{_includedir}/clapack.h
+%{_libdir}/atlas-sse/*.so
+%{_includedir}/atlas-sse/
 
 # ifarch ix86
   %endif
@@ -158,8 +240,24 @@ optimizations (Pentium III).
 %package	-n %{libname}-sse2
 Summary:	ATLAS libraries for SSE2 extensions
 Group:		System/Libraries
+%ifarch %{ix86}
 Obsoletes:	%mklibname %{name}3.0-sse2
+%else
+Obsoletes:	%{libname}-x86_64
+%endif
 Provides:	%{libatlas} = %{version}-%{release}
+Conflicts:	%{libname}-custom < %{version}-%{release}
+Conflicts:	%{libatlas}-custom-devel < %{version}-%{release}
+%ifnarch x86_64
+Conflicts:	%{libname}-sse < %{version}-%{release}
+Conflicts:	%{libatlas}-sse-devel < %{version}-%{release}
+%endif
+Conflicts:	%{libatlas}-sse2-devel < %{version}-%{release}
+Conflicts:	%{libname}-sse3 < %{version}-%{release}
+Conflicts:	%{libatlas}-sse3-devel < %{version}-%{release}
+Conflicts:	atlas < %{version}-%{release}
+Requires(post):	update-alternatives
+Requires(postun): update-alternatives
 
 %description	-n %{libname}-sse2
 This package contains the ATLAS (Automatically Tuned Linear Algebra
@@ -167,17 +265,21 @@ Software) libraries compiled with SSE2 optimizations.
 This is a generic binary package. Install the "%{name}" package
 to build a version tuned for your computer.
 
-%if %mdkversion < 200900
-%post -n %{libname}-sse2 -p /sbin/ldconfig
+%posttrans	-n %{libname}-sse2
+update-alternatives							\
+    --install %{_libdir}/atlas atlas %{_libdir}/atlas-sse2 2		\
+    --slave %{_sysconfdir}/ld.so.conf.d/atlas.conf atlas-conf %{_libdir}/atlas-sse2/atlas.conf
 
-%postun -n %{libname}-sse2 -p /sbin/ldconfig
-%endif
+%postun		-n %{libname}-sse2
+if [ $1 -eq 0 ]; then
+    update-alternatives --remove atlas %{_libdir}/atlas-sse2
+fi
 
 %files		-n %{libname}-sse2
 %defattr(-,root,root,-)
-%dir %{_libdir}/atlas
-%{_libdir}/atlas/*.so.*
-%{_sysconfdir}/ld.so.conf.d/atlas.conf
+%dir %{_libdir}/atlas-sse2
+%{_libdir}/atlas-sse2/*.so.*
+%{_libdir}/atlas-sse2/atlas.conf
 
 #------#################################################################
 %package	-n %{libatlas}-sse2-devel
@@ -185,27 +287,53 @@ Summary:	Development files for ATLAS SSE2
 Group:		Development/Other
 Requires:	%{libname}-sse2 = %{version}-%{release}
 Provides:	%{libatlas}-devel = %{version}-%{release}
+%ifarch x86_64
+Obsoletes:	%{libatlas}-x86_64-devel
+%endif
+Requires(post):	update-alternatives
+Requires(postun): update-alternatives
 
 %description	-n %{libatlas}-sse2-devel
 This package contains headers and development libraries of ATLAS
 (Automatically Tuned Linear Algebra Software) compiled with SSE2
 optimizations.
 
+%posttrans	-n %{libatlas}-sse2-devel
+update-alternatives							\
+    --install %{_includedir}/atlas atlas-devel %{_includedir}/atlas-sse2 2 \
+    --slave %{_includedir}/cblas.h cblas.h %{_includedir}/atlas-sse2/cblas.h \
+    --slave %{_includedir}/clapack.h clapack.h %{_includedir}/atlas-sse2/clapack.h
+
+%postun		-n %{libatlas}-sse2-devel
+if [ $1 -eq 0 ]; then
+    update-alternatives --remove atlas-devel %{_includedir}/atlas-sse2
+fi
+
 %files		-n %{libatlas}-sse2-devel
 %defattr(-,root,root,-)
 %doc doc/*
-%{_libdir}/atlas/*.so
-%{_libdir}/atlas/*.a
-%dir %{_includedir}/atlas
-%{_includedir}/atlas/*.h
-%{_includedir}/cblas.h
-%{_includedir}/clapack.h
+%{_libdir}/atlas-sse2/*.a
+%{_libdir}/atlas-sse2/*.so
+%{_includedir}/atlas-sse2/
 
 #----###################################################################
 %package	-n %{libname}-sse3
 Summary:	ATLAS libraries for SSE3 extensions
 Group:		System/Libraries
 Provides:	%{libatlas} = %{version}-%{release}
+Conflicts:	%{libname}-custom < %{version}-%{release}
+Conflicts:	%{libatlas}-custom-devel < %{version}-%{release}
+%ifnarch x86_64
+Conflicts:	%{libname}-sse < %{version}-%{release}
+Conflicts:	%{libatlas}-sse-devel < %{version}-%{release}
+%endif
+Conflicts:	%{libname}-sse2 < %{version}-%{release}
+Conflicts:	%{libatlas}-sse2-devel < %{version}-%{release}
+Conflicts:	atlas < %{version}-%{release}
+Conflicts:	%{libatlas}-sse3-devel < %{version}-%{release}
+Conflicts:	atlas < %{version}-%{release}
+Requires(post):	update-alternatives
+Requires(postun): update-alternatives
 
 %description	-n %{libname}-sse3
 This package contains the ATLAS (Automatically Tuned Linear Algebra
@@ -213,17 +341,21 @@ Software) libraries compiled with SS3 optimizations.
 This is a generic binary package. Install the "%{name}" package
 to build a version tuned for your computer.
 
-%if %mdkversion < 200900
-%post -n %{libname}-sse3 -p /sbin/ldconfig
+%posttrans	-n %{libname}-sse3
+update-alternatives							\
+    --install %{_libdir}/atlas atlas %{_libdir}/atlas-sse3 3		\
+    --slave %{_sysconfdir}/ld.so.conf.d/atlas.conf atlas-conf %{_libdir}/atlas-sse3/atlas.conf
 
-%postun -n %{libname}-sse3 -p /sbin/ldconfig
-%endif
+%postun		-n %{libname}-sse3
+if [ $1 -eq 0 ]; then
+    update-alternatives --remove atlas %{_libdir}/atlas-sse3
+fi
 
 %files		-n %{libname}-sse3
 %defattr(-,root,root,-)
 %dir %{_libdir}/atlas-sse3
 %{_libdir}/atlas-sse3/*.so.*
-%{_sysconfdir}/ld.so.conf.d/atlas-sse3.conf
+%{_libdir}/atlas-sse3/atlas.conf
 
 #------#################################################################
 %package	-n %{libatlas}-sse3-devel
@@ -231,21 +363,31 @@ Summary:	Development files for ATLAS SSE3
 Group:		Development/Other
 Requires:	%{libname}-sse3 = %{version}-%{release}
 Provides:	%{libatlas}-devel = %{version}-%{release}
+Requires(post):	update-alternatives
+Requires(postun): update-alternatives
 
 %description	-n %{libatlas}-sse3-devel
 This package contains headers and development libraries of ATLAS
 (Automatically Tuned Linear Algebra Software) compiled with SSE3
 optimizations.
 
+%posttrans	-n %{libatlas}-sse3-devel
+update-alternatives							\
+    --install %{_includedir}/atlas atlas-devel %{_includedir}/atlas-sse3 3 \
+    --slave %{_includedir}/cblas.h cblas.h %{_includedir}/atlas-sse3/cblas.h \
+    --slave %{_includedir}/clapack.h clapack.h %{_includedir}/atlas-sse3/clapack.h
+
+%postun		-n %{libatlas}-sse3-devel
+if [ $1 -eq 0 ]; then
+    update-alternatives --remove atlas-devel %{_includedir}/atlas-sse3
+fi
+
 %files		-n %{libatlas}-sse3-devel
 %defattr(-,root,root,-)
 %doc doc/*
 %{_libdir}/atlas-sse3/*.so
 %{_libdir}/atlas-sse3/*.a
-%dir %{_includedir}/atlas
-%{_includedir}/atlas/*.h
-%{_includedir}/cblas.h
-%{_includedir}/clapack.h
+%{_includedir}/atlas-sse3/
 
 # ifarch ix86 x86_64
   %endif
@@ -257,6 +399,12 @@ optimizations.
 Summary:	ATLAS libraries for %{_arch}
 Group:		System/Libraries
 Provides:	%{libatlas} = %{version}-%{release}
+Conflicts:	%{libname}-custom < %{version}-%{release}
+Conflicts:	%{libatlas}-custom-devel < %{version}-%{release}
+Conflicts:	%{libatlas}-%{_arch}-devel < %{version}-%{release}
+Conflicts:	atlas < %{version}-%{release}
+Requires(post):	update-alternatives
+Requires(postun): update-alternatives
 
 %description	-n %{libname}-%{_arch}
 This package contains the ATLAS (Automatically Tuned Linear Algebra
@@ -264,17 +412,21 @@ Software) libraries compiled with %{_arch} optimizations.
 This is a generic binary package. Install the "%{name}" package
 to build a version tuned for your computer.
 
-%if %mdkversion < 200900
-%post -n %{libname}-%{_arch} -p /sbin/ldconfig
+%posttrans	-n %{libname}-%{_arch}
+update-alternatives							\
+    --install %{_libdir}/atlas atlas %{_libdir}/atlas-%{_arch} 2	\
+    --slave %{_sysconfdir}/ld.so.conf.d/atlas.conf atlas-conf %{_libdir}/atlas-%{_arch}/atlas.conf
 
-%postun -n %{libname}-%{_arch} -p /sbin/ldconfig
-%endif
+%postun		-n %{libname}-%{_arch}
+if [ $1 -eq 0 ]; then
+    update-alternatives --remove atlas %{_libdir}/atlas-%{_arch}
+fi
 
 %files		-n %{libname}-%{_arch}
 %defattr(-,root,root,-)
 %dir %{_libdir}/atlas
-%{_libdir}/atlas/*.so.*
-%{_sysconfdir}/ld.so.conf.d/atlas.conf
+%{_libdir}/atlas-%{_arch}/*.so.*
+%{_libdir}/atlas-%{_arch}/atlas.conf
 
 #------#################################################################
 %package	-n %{libatlas}-%{_arch}-devel
@@ -282,25 +434,35 @@ Summary:	Development files for ATLAS for %{_arch}
 Group:		Development/Other
 Requires:	%{libname}-%{_arch} = %{version}-%{release}
 Provides:	%{libatlas}-devel = %{version}-%{release}
+Requires(post):	update-alternatives
+Requires(postun): update-alternatives
 
 %description	-n %{libatlas}-%{_arch}-devel
 This package contains headers and development libraries of ATLAS
 (Automatically Tuned Linear Algebra Software) compiled with %{_arch}
 optimizations.
 
+%posttrans	-n %{libatlas}-%{_arch}-devel
+update-alternatives							\
+    --install %{_includedir}/atlas atlas-devel %{_includedir}/atlas-%{_arch} 2 \
+    --slave %{_includedir}/cblas.h cblas.h %{_includedir}/atlas-%{_arch}/cblas.h \
+    --slave %{_includedir}/clapack.h clapack.h %{_includedir}/atlas-%{_arch}/clapack.h
+
+%postun		-n %{libatlas}-%{_arch}-devel
+if [ $1 -eq 0 ]; then
+    update-alternatives --remove atlas-devel %{_includedir}/atlas-%{_arch}
+fi
+
 %files		-n %{libatlas}-%{_arch}-devel
 %defattr(-,root,root,-)
 %doc doc/*
-%{_libdir}/atlas/*.so
-%{_libdir}/atlas/*.a
-%dir %{_includedir}/atlas
-%{_includedir}/atlas/*.h
-%{_includedir}/cblas.h
-%{_includedir}/clapack.h
+%{_libdir}/atlas-%{_arch}/*.a
+%{_libdir}/atlas-%{_arch}/*.so
+%{_includedir}/atlas-%{_arch}/
 
 # ifnarch ix86 x86_64
   %endif
-# enable_custom_atlas
+# with custom_atlas
 %endif
 
 ########################################################################
@@ -314,7 +476,7 @@ cp %{SOURCE1} %{SOURCE2} %{SOURCE3} doc
 %build
 for type in %{types}; do
     case $type in
-	sse2|%{_arch})	libname=%{name}		;;
+	%{_arch})	libname=%{name}		;;
 	*)		libname=%{name}-$type	;;
     esac
     mkdir -p %{_arch}_${type}
@@ -356,11 +518,9 @@ for type in %{types}; do
 done
 
 %install
+mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d
 for type in %{types}; do
-    case $type in
-	sse2|%{_arch})	dirname=%{name}		;;
-	*)		dirname=%{name}-$type	;;
-    esac
+    dirname=%{name}-$type
     pushd %{_arch}_${type}
 	make DESTDIR=%{buildroot} install || :
 	mkdir -p %{buildroot}%{_libdir}/${dirname}
@@ -368,101 +528,37 @@ for type in %{types}; do
 %if %{without atlas_liblapack}
 	rm -f %{buildroot}%{_libdir}/${dirname}/liblapack.so*
 %endif
+	mv %{buildroot}%{_includedir}/atlas %{buildroot}%{_includedir}/${dirname}
+	mv %{buildroot}%{_includedir}/*.h %{buildroot}%{_includedir}/${dirname}
     popd
-    mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d
-    echo "%{_libdir}/${dirname}"				\
-	> %{buildroot}%{_sysconfdir}/ld.so.conf.d/${dirname}.conf
+    echo "%{_libdir}/${dirname}"					\
+	> %{buildroot}%{_libdir}/${dirname}/atlas.conf
 done
 
-mkdir -p %{buildroot}%{_libdir}/%{name}
+mkdir -p %{buildroot}%{_libdir}/%{name}-source
+mkdir -p %{buildroot}%{_includedir}/%{name}-source
 mkdir -p %{buildroot}%{_usrsrc}
 tar jxf %{SOURCE0} -C %{buildroot}%{_usrsrc}
 pushd %{buildroot}%{_usrsrc}/ATLAS
     patch -p0 < %{PATCH0}
 popd
 
-cat > %{buildroot}%{_usrsrc}/ATLAS/Makefile << EOF
-
-all:	config libs
-
-libs:
-	mkdir -p %{_libdir}/%{name} &&					\
-	(cd %{_arch} && make build && cd lib && make shared && make ptshared || :)
-
-config:
-	[ -d %{_arch} ] || (mkdir -p %{_arch} && cd %{_arch} &&		\
-	../configure -b %{mode} -D c -DWALL -Fa alg			\
-	'-Wa,--noexecstack -fPIC'					\
-	-Ss f77lib `gfortran --print-file-name=libgfortran.so`		\
-	--prefix=%{_prefix}						\
-	--incdir=%{_includedir}/%{name}					\
-	--libdir=%{_libdir}/%{name}					\
-	--with-netlib-lapack=%{_libdir}/liblapack_pic.a)
-
-clean:
-	rm -fr %{_arch}
-
-install:
-	(cd %{_arch} && (make install || :) &&				\
-	cp -pr lib/*.so* %{_libdir}/%{name} &&				\
-	echo "%{_libdir}/%{name}" > %{_sysconfdir}/ld.so.conf.d/%{name}.conf)
+install -D %{SOURCE4} %{buildroot}%{_usrsrc}/ATLAS/Makefile
+perl -pi -e 's|@@LIBDIR@@|%{_libdir}|g;'				\
+	 -e 's|@@ARCH@@|%{_arch}|g;'					\
+	 -e 's|@@MODE@@|%{mode}|g;'					\
 %if %{without atlas_liblapack}
-	rm -f %{buildroot}%{_libdir}/${dirname}/liblapack.so*
+	-e 's|@@LAPACK@@||;'						\
+%else
+	-e 's|@@LAPACK@@|#|;'						\
 %endif
+	%{buildroot}%{_usrsrc}/ATLAS/Makefile
 
-uninstall:
-	rm -fr %{_libdir}/%{name}/*
-	rm -fr %{_includedir}/%{name}/*
-	rm -f %{_sysconfdir}/ld.so.conf.d/%{name}.conf
-	rm -f %{_includedir}/cblas.h
-	rm -f %{_includedir}/clapack.h
-
-EOF
-
-cat >  %{buildroot}%{_usrsrc}/ATLAS/README.mandriva << EOF
-
-  To build a tuned version of atlas for you computer, as root, run:
-
-% cd %{_usrsrc}/ATLAS
-
-% make all install
-
-  The Makefile in this directory uses the same options as the
-precompiled atlas packages, and uses the same directory layout.
-
-
-  You may also prefer to have the files handled by rpm, in which
-case you need the source rpm, with which you can run:
-% rpmbuild --with custom_atlas --rebuild atlas-%{version}-%{release}.src.rpm
-
-
-  NOTES
-
-o It is advisable to ensure cpu throttling is off. To do this:
-
-  % urpmi cpufrequtils
-  % cpufreq-set -g performance
-
-o The tests during compilation are heavily dependent on cpu
-  load. It is advisable to have as few background processes as
-  possible during compilation, otherwise if timing samples are
-  too much different, the build will fail, in which case, you
-  can run:
-
-  % cd %{_arch}
-  % make
-
-  to retry.
-
-o Please also consult the files README and INSTALL.txt.
-  Extra documentation is in %{_docdir}/atlas
-  Example:
-  % cd %{_arch}		# change to architecture build
-  % make check		# check if library produces expected results
-  % make ptcheck	# check threaded/smp library (if detected/built)
-  % make time		# check if library has the expected performance
-
-EOF
+install -D %{SOURCE5} %{buildroot}%{_usrsrc}/ATLAS/README.mandriva
+perl -pi -e 's|@@VERSION@@|%{version}|g;'				\
+	 -e 's|@@RELEASE@@|%{release}|g;'				\
+	 -e 's|@@ARCH@@|%{_arch}|g;'					\
+	%{buildroot}%{_usrsrc}/ATLAS/README.mandriva
 
 %clean
 rm -rf %{buildroot}
@@ -479,6 +575,6 @@ echo "
 %defattr(-,root,root,-)
 %dir %{_usrsrc}/ATLAS
 %{_usrsrc}/ATLAS/*
-%dir %{_includedir}/%{name}
-%dir %{_libdir}/%{name}
+%dir %{_includedir}/%{name}-source
+%dir %{_libdir}/%{name}-source
 %doc doc/*
