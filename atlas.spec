@@ -508,7 +508,7 @@ pushd temp
 	  sgetri.o sgetrs.o slauum.o sposv.o spotrf.o spotri.o		\
 	  spotrs.o strtri.o zgesv.o zgetrf.o zgetri.o zgetrs.o		\
 	  zlauum.o zposv.o zpotrf.o zpotri.o zpotrs.o ztrtri.o
-    ar q ../liblapack.a
+    ar q ../liblapack.a *.o
 popd
 rm -fr temp
 
