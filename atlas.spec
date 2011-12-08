@@ -480,6 +480,7 @@ function build {
 	%{_arch})	libname=%{name}		;;
 	*)		libname=%{name}-$type	;;
     esac
+    rm -fr %{_arch}_${type}
     mkdir -p %{_arch}_${type}
     pushd %{_arch}_${type}
 	../configure -b %{mode} -D c -DWALL -Fa alg			\
