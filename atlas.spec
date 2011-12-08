@@ -519,9 +519,7 @@ popd
 rm -fr temp
 
 %build
-RESULT=`mktemp $TMPDIR/atlasXXXXXX`
-function build {
-    type=$1
+for type in %{types}; do
     case $type in
 	%{_arch})	libname=%{name}		;;
 	*)		libname=%{name}-$type	;;
@@ -559,36 +557,11 @@ function build {
 %endif
 	fi
 	make build
-	if test $? != 0; then
-		echo -n 1 > $RESULT
-		return 0
-	fi
 	cd lib
 	make shared
-	if test $? != 0; then
-		echo -n 1 > $RESULT
-		return 0
-	fi
 	make ptshared
-	if test $? != 0; then
-		echo -n 1 > $RESULT
-		return 0
-	fi
     popd
-    echo -n 0 > $RESULT
-}
-
-for type in %{types}; do
-    for try in 1 2 3 4 5 6 7 8 9 10; do
-	build $type
-	result=`cat $RESULT`
-	if test $result = 0; then
-	    break
-	fi
-    done
-    [ $result != 0 ] && exit 1
 done
-rm -f $RESULT
 
 %install
 for type in %{types}; do
