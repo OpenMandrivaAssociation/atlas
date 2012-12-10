@@ -3,18 +3,17 @@
 
 %bcond_with		custom_atlas
 
-%define name		atlas
 %define major		3
 %define libatlas	libatlas
 %define libname		%mklibname %{name} %{major}
 
-Name:		%{name}
+Name:		atlas
 Version:	3.8.4
-Release:	%mkrel 3
-Summary:        Automatically Tuned Linear Algebra Software
-Group:          Sciences/Mathematics
-License:        BSD
-URL:            http://math-atlas.sourceforge.net/
+Release:	4
+Summary:	Automatically Tuned Linear Algebra Software
+Group:		Sciences/Mathematics
+License:	BSD
+URL:		http://math-atlas.sourceforge.net/
 Source0:	http://downloads.sourceforge.net/math-atlas/atlas%{version}.tar.bz2
 Source1:	http://math-atlas.sourceforge.net/errata.html
 Source2:	http://math-atlas.sourceforge.net/faq.html
@@ -105,7 +104,6 @@ if [ $1 -eq 0 ]; then
 fi
 
 %files		-n %{libname}-custom
-%defattr(-,root,root,-)
 %dir %{_libdir}/atlas-custom
 %{_libdir}/atlas-custom/*.so.*
 %{_libdir}/atlas-custom/atlas.conf
@@ -136,7 +134,6 @@ if [ $1 -eq 0 ]; then
 fi
 
 %files		-n %{libatlas}-custom-devel
-%defattr(-,root,root,-)
 %doc doc/*
 %{_libdir}/atlas-custom/*.a
 %{_libdir}/atlas-custom/*.so
@@ -233,7 +230,6 @@ if [ $1 -eq 0 ]; then
 fi
 
 %files		-n %{libatlas}-sse-devel
-%defattr(-,root,root,-)
 %doc doc/*
 %{_libdir}/atlas-sse/*.a
 %{_libdir}/atlas-sse/*.so
@@ -322,7 +318,6 @@ if [ $1 -eq 0 ]; then
 fi
 
 %files		-n %{libatlas}-sse2-devel
-%defattr(-,root,root,-)
 %doc doc/*
 %{_libdir}/atlas-sse2/*.a
 %{_libdir}/atlas-sse2/*.so
@@ -369,7 +364,6 @@ if [ $1 -eq 0 ]; then
 fi
 
 %files		-n %{libname}-sse3
-%defattr(-,root,root,-)
 %dir %{_libdir}/atlas-sse3
 %{_libdir}/atlas-sse3/*.so.*
 %{_libdir}/atlas-sse3/atlas.conf
@@ -403,7 +397,6 @@ if [ $1 -eq 0 ]; then
 fi
 
 %files		-n %{libatlas}-sse3-devel
-%defattr(-,root,root,-)
 %doc doc/*
 %{_libdir}/atlas-sse3/*.so
 %{_libdir}/atlas-sse3/*.a
@@ -445,7 +438,6 @@ if [ $1 -eq 0 ]; then
 fi
 
 %files		-n %{libname}-%{_arch}
-%defattr(-,root,root,-)
 %dir %{_libdir}/atlas
 %{_libdir}/atlas-%{_arch}/*.so.*
 %{_libdir}/atlas-%{_arch}/atlas.conf
@@ -556,6 +548,8 @@ for type in %{types}; do
 		sed -i 's#ARCH =.*#ARCH = HAMMER64SSE3#' Make.inc
 %endif
 	fi
+	sed -i 's#-melf_i386##' Make.inc
+	sed -i 's#-melf_x86_64##' Make.inc
 	make build
 	cd lib
 	make shared
@@ -609,9 +603,10 @@ echo "
 "
 
 %files
-%defattr(-,root,root,-)
 %dir %{_usrsrc}/ATLAS
 %{_usrsrc}/ATLAS/*
 %dir %{_includedir}/%{name}-source
 %dir %{_libdir}/%{name}-source
 %doc doc/*
+
+
