@@ -12,7 +12,7 @@
 
 Name:		atlas
 Version:	3.8.4
-Release:	4
+Release:	5
 Summary:	Automatically Tuned Linear Algebra Software
 Group:		Sciences/Mathematics
 License:	BSD
@@ -46,7 +46,7 @@ Conflicts:	%{libatlas}-%{_arch}-devel < %{version}-%{release}
 Requires(post):	update-alternatives
 Requires(postun): update-alternatives
 
-Requires:	gcc-gfortran liblapack-devel make
+Requires:	gcc-gfortran lapack-devel make
 BuildRequires:	gcc-gfortran
 # ensure it has a pic liblapack.a
 BuildRequires:	lapack-devel > 3.3.1-1
