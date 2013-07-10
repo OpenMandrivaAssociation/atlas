@@ -195,7 +195,6 @@ if [ $1 -eq 0 ]; then
 fi
 
 %files		-n %{libname}-sse
-%defattr(-,root,root,-)
 %dir %{_libdir}/atlas-sse
 %{_libdir}/atlas-sse/*.so.*
 %{_libdir}/atlas-sse/atlas.conf
@@ -282,7 +281,6 @@ if [ $1 -eq 0 ]; then
 fi
 
 %files		-n %{libname}-sse2
-%defattr(-,root,root,-)
 %dir %{_libdir}/atlas-sse2
 %{_libdir}/atlas-sse2/*.so.*
 %{_libdir}/atlas-sse2/atlas.conf
@@ -470,7 +468,6 @@ if [ $1 -eq 0 ]; then
 fi
 
 %files		-n %{libatlas}-%{_arch}-devel
-%defattr(-,root,root,-)
 %doc doc/*
 %{_libdir}/atlas-%{_arch}/*.a
 %{_libdir}/atlas-%{_arch}/*.so
