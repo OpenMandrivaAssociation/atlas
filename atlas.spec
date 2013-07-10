@@ -3,6 +3,9 @@
 
 %bcond_with		custom_atlas
 
+%define _enable_debug_packages	%{nil}
+%define debug_package		%{nil}
+
 %define major		3
 %define libatlas	libatlas
 %define libname		%mklibname %{name} %{major}
