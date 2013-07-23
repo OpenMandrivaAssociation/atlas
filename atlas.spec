@@ -6,13 +6,19 @@
 %define _enable_debug_packages	%{nil}
 %define debug_package		%{nil}
 
+# Keep these libraries private because they are not in %%{_libdir}
+%if %{_use_internal_dependency_generator}
+%define __noautoprov 'libatlas\\.so\\.(.*)|libcblas\\.so\\.(.*)|libclapack\\.so\\.(.*)|libf77blas\\.so\\.(.*)|liblapack\\.so\\.(.*)|libptcblas\\.so\\.(.*)|libptf77blas\\.so\\.(.*)'
+%define __noautoreq 'libatlas\\.so\\.(.*)|libcblas\\.so\\.(.*)|libclapack\\.so\\.(.*)|libf77blas\\.so\\.(.*)|liblapack\\.so\\.(.*)|libptcblas\\.so\\.(.*)|libptf77blas\\.so\\.(.*)'
+%endif
+
 %define major		3
 %define libatlas	libatlas
 %define libname		%mklibname %{name} %{major}
 
 Name:		atlas
 Version:	3.8.4
-Release:	5
+Release:	5.1
 Summary:	Automatically Tuned Linear Algebra Software
 Group:		Sciences/Mathematics
 License:	BSD
@@ -50,8 +56,6 @@ Requires:	gcc-gfortran lapack-devel make
 BuildRequires:	gcc-gfortran
 # ensure it has a pic liblapack.a
 BuildRequires:	lapack-devel > 3.3.1-1
-
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root
 
 %description
 The ATLAS (Automatically Tuned Linear Algebra Software) project is an
@@ -522,6 +526,7 @@ for type in %{types}; do
 	../configure -b %{mode} -D c -DWALL -Fa alg			\
 	    '-Wa,--noexecstack -fPIC'					\
 	    -Ss f77lib `gfortran --print-file-name=libgfortran.so`	\
+	    -Si cputhrchk 0 \
 	    --prefix=%{buildroot}%{_prefix}				\
 	    --incdir=%{buildroot}%{_includedir}				\
 	    --libdir=%{buildroot}%{_libdir}/${libname}			\
@@ -590,9 +595,6 @@ perl -pi -e 's|\@\@VERSION\@\@|%{version}|g;'				\
 	 -e 's|\@\@RELEASE\@\@|%{release}|g;'				\
 	 -e 's|\@\@ARCH\@\@|%{_arch}|g;'				\
 	%{buildroot}%{_usrsrc}/ATLAS/README.mandriva
-
-%clean
-rm -rf %{buildroot}
 
 ########################################################################
 %post
