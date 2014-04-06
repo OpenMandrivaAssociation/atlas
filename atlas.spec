@@ -1,6 +1,8 @@
 # Based on fedora package:
 # http://pkgs.fedoraproject.org/cgit/atlas.git
 
+%global _duplicate_files_terminate_build	0
+
 %define enable_native_atlas	0
 %define __isa_bits		32
 %ifarch x86_64 aarch64
