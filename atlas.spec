@@ -53,6 +53,7 @@ Source12:	IBMz932.tar.bz2
 Source13:	IBMz964.tar.bz2
 #upstream arm uses softfp abi, fedora arm uses hard
 Source14:	ARMv732NEON.tar.bz2
+Source100:	%{name}.rpmlintrc
 
 Patch1:		atlas-s390port.patch
 Patch2:		atlas-fedora-arm.patch
