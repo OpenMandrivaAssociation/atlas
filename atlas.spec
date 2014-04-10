@@ -83,7 +83,7 @@ well as a few routines from LAPACK.
 %package	-n %{libname}
 Summary:	Automatically Tuned Linear Algebra Software
 Provides:	%{libatlas} = %{version}-%{release}
-%ifarch %{ix86} x86_64
+%ifarch x86_64
 Obsoletes:	%{libname}-sse2
 %endif
 %ifarch x86_64
@@ -121,7 +121,7 @@ Summary:        Development libraries for ATLAS
 Requires:       %{libname} = %{version}-%{release}
 Requires(posttrans):	update-alternatives
 Requires(preun):	update-alternatives
-%ifarch %{ix86} x86_64
+%ifarch x86_64
 Obsoletes:	%{libatlas}-sse2-devel
 %endif
 %ifarch x86_64
