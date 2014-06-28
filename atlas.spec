@@ -39,7 +39,7 @@ Version:	3.10.1
 %if "%{?enable_native_atlas}" != "0"
   %define dist		.native
 %endif
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Automatically Tuned Linear Algebra Software
 License:        BSD
 URL:            http://math-atlas.sourceforge.net/
