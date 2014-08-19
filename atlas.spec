@@ -43,17 +43,17 @@ Release:        3%{?dist}
 Summary:        Automatically Tuned Linear Algebra Software
 License:        BSD
 URL:            http://math-atlas.sourceforge.net/
-Source0:	http://downloads.sourceforge.net/math-atlas/%{name}%{version}.tar.bz2
-Source1:	PPRO32.tgz
+Source0:		http://downloads.sourceforge.net/math-atlas/%{name}%{version}.tar.bz2
+Source1:		PPRO32.tgz
 Source3:        README.dist
-Source10:	http://www.netlib.org/lapack/lapack-3.5.0.tgz
+Source10:		http://www.netlib.org/lapack/lapack-3.5.0.tgz
 #archdefs taken from debian:
-Source11:	POWER332.tar.bz2
-Source12:	IBMz932.tar.bz2
-Source13:	IBMz964.tar.bz2
+Source11:		POWER332.tar.bz2
+Source12:		IBMz932.tar.bz2
+Source13:		IBMz964.tar.bz2
 #upstream arm uses softfp abi, fedora arm uses hard
-Source14:	ARMv732NEON.tar.bz2
-Source100:	%{name}.rpmlintrc
+Source14:		ARMv732NEON.tar.bz2
+Source100:		%{name}.rpmlintrc
 
 Patch1:		atlas-s390port.patch
 Patch2:		atlas-fedora-arm.patch
