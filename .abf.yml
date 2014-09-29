@@ -1,8 +1,8 @@
 sources:
-  atlas3.10.1.tar.bz2: cd5bfb06af3de60de1226078a9247684b44d0451
   ARMv732NEON.tar.bz2: 9398518fe55b4a544278237bc639656e04543c50
   IBMz932.tar.bz2: b3ee9bca1510b11c6aa671ba5ba7dff8918ce0cf
   IBMz964.tar.bz2: 43f8d8eaf8cc62bc4665df3550b77e95f3dced22
-  lapack-3.5.0.tgz: 1ab3c64bf9e79ff6d4e98eac8dc72d2bddedabe3
   POWER332.tar.bz2: c47ac6f00d7bf4ab882e71fa1ab894cc551c77b7
   PPRO32.tgz: 85c00d3190abbe250d46472824b17d9164e3dfc2
+  atlas3.10.2.tar.bz2: f1f883e201d70ff60d54a2af016b4afc83a2499b
+  lapack-3.5.0.tgz: 1ab3c64bf9e79ff6d4e98eac8dc72d2bddedabe3

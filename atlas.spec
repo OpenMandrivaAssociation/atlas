@@ -35,7 +35,7 @@
 %define libname		%mklibname %{name} %{major}
 
 Name:		atlas
-Version:	3.10.1
+Version:	3.10.2
 %if "%{?enable_native_atlas}" != "0"
   %define dist		.native
 %endif
