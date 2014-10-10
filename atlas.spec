@@ -67,7 +67,7 @@ Patch5:		atlas-shared_libraries.patch
 
 Patch6:		atlas-affinity.patch
 
-Patch7:		atlas-aarch64port.patch
+Patch7:		0001-aarch64-support.patch
 Patch8:		atlas-genparse.patch
 
 BuildRequires:	gcc-gfortran
