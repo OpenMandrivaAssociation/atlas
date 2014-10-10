@@ -56,7 +56,7 @@ Source14:		ARMv732NEON.tar.bz2
 Source100:		%{name}.rpmlintrc
 
 Patch1:		atlas-s390port.patch
-Patch2:		atlas-fedora-arm.patch
+Patch2:		atlas-no-m32-on-ARM.patch
 # Properly pass -melf_* to the linker with -Wl, fixes FTBFS bug 817552
 # https://sourceforge.net/tracker/?func=detail&atid=379484&aid=3555789&group_id=23725
 Patch3:		atlas-melf.patch
@@ -273,6 +273,7 @@ fi
 %ifarch s390 s390x
 %patch1 -p1 -b .s390
 %endif
+%patch2 -p1 -b .m32arm
 %patch3 -p1 -b .melf
 %patch4 -p1 -b .thrott
 %patch5 -p2 -b .sharedlib

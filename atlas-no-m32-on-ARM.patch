@@ -1,0 +1,19 @@
+diff --git a/CONFIG/src/probe_comp.c b/CONFIG/src/probe_comp.c
+index 4cdf8d4..861b60e 100644
+--- a/CONFIG/src/probe_comp.c
++++ b/CONFIG/src/probe_comp.c
+@@ -613,12 +613,14 @@ char *GetPtrbitsFlag(enum OSTYPE OS, enum MACHTYPE arch, int ptrbits,
+       sp = (ptrbits == 64) ? "-maix64" : "-maix32";
+    else if ((MachIsX86(arch) || MachIsPPC(arch) || MachIsUS(arch)) ||
+             arch == IbmPwr7 || arch == IbmPwr6 || arch == Pwre6500)
++#ifndef __ARM__
+    {
+       if (ptrbits == 64)
+          sp = "-m64";
+       else if (ptrbits == 32)
+          sp = "-m32";
+    }
++#endif
+    return(sp);
+ }
+ char *GetStandardCompName(char *comp)
