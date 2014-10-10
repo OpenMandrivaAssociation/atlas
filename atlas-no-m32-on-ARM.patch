@@ -6,7 +6,7 @@ index 4cdf8d4..861b60e 100644
        sp = (ptrbits == 64) ? "-maix64" : "-maix32";
     else if ((MachIsX86(arch) || MachIsPPC(arch) || MachIsUS(arch)) ||
              arch == IbmPwr7 || arch == IbmPwr6 || arch == Pwre6500)
-+#ifndef __ARM__
++#ifndef __arm__
     {
        if (ptrbits == 64)
           sp = "-m64";
