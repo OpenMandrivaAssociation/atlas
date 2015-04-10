@@ -310,7 +310,8 @@ for type in %{types}; do
 
 	mkdir -p %{_arch}_${type}
 	pushd %{_arch}_${type}
-	../configure  %{mode} %{?threads_option} %{?arch_option} -D c -DWALL -Fa alg '%{armflags} -g -Wa,--noexecstack -fPIC'\
+	../configure  %{mode} %{?threads_option} %{?arch_option} -D c -DWALL -C acg 'gcc' -Fa alg '%{armflags} -g -Wa,--noexecstack -fPIC'\
+	--cc=gcc					\
 	--prefix=%{buildroot}%{_prefix}			\
 	--incdir=%{buildroot}%{_includedir}		\
 	--libdir=%{buildroot}%{_libdir}/${libname}	\
