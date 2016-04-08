@@ -41,19 +41,19 @@ Version:	3.10.2
 %endif
 Release:        3%{?dist}
 Summary:        Automatically Tuned Linear Algebra Software
-License:        BSD
-URL:            http://math-atlas.sourceforge.net/
-Source0:		http://downloads.sourceforge.net/math-atlas/%{name}%{version}.tar.bz2
-Source1:		PPRO32.tgz
-Source3:        README.dist
-Source10:		http://www.netlib.org/lapack/lapack-3.5.0.tgz
+License:	BSD
+URL:		http://math-atlas.sourceforge.net/
+Source0:	http://downloads.sourceforge.net/math-atlas/%{name}%{version}.tar.bz2
+Source1:	PPRO32.tgz
+Source3:	README.dist
+Source10:	http://www.netlib.org/lapack/lapack-3.6.0.tgz
 #archdefs taken from debian:
-Source11:		POWER332.tar.bz2
-Source12:		IBMz932.tar.bz2
-Source13:		IBMz964.tar.bz2
+Source11:	POWER332.tar.bz2
+Source12:	IBMz932.tar.bz2
+Source13:	IBMz964.tar.bz2
 #upstream arm uses softfp abi, fedora arm uses hard
-Source14:		ARMv732NEON.tar.bz2
-Source100:		%{name}.rpmlintrc
+Source14:	ARMv732NEON.tar.bz2
+Source100:	%{name}.rpmlintrc
 
 Patch1:		atlas-s390port.patch
 Patch2:		atlas-no-m32-on-ARM.patch
@@ -150,6 +150,7 @@ fi
 %files		-n %{libatlas}-devel
 %doc doc
 %{_libdir}/atlas/*.so
+%{_libdir}/pkgconfig/atlas.pc
 %{_includedir}/atlas-%{_arch}-base/
 %{_includedir}/*.h
 %ghost %{_includedir}/atlas
@@ -301,6 +302,7 @@ sed -i -e 's,-mfpu=vfpv3,,' tune/blas/gemm/CASES/*.flg
 %endif
 
 %build
+
 for type in %{types}; do
 	if [ "$type" = "base" ]; then
 		libname=atlas
@@ -326,6 +328,7 @@ for type in %{types}; do
 		sed -i 's#-DATL_AVX##' Make.inc 
 #		sed -i 's#-msse3#-msse2#' Make.inc 
 		sed -i 's#-mavx#-msse3#' Make.inc
+		sed -i 's#MAC##' Make.inc
 		echo 'base makefile edited' 
 #		sed -i 's#PMAKE = $(MAKE) .*#PMAKE = $(MAKE) -j 1#' Make.inc 
 	elif [ "$type" = "sse3" ]; then
@@ -361,63 +364,6 @@ for type in %{types}; do
 	fi
 %endif
 
-%ifarch s390 s390x
-# we require a z9/z10/z196 but base,z10 and z196
-# we also need a compiler with -march=z196 support
-# the base support will use z196 tuning
-	if [ "$type" = "base" ]; then
-		%ifarch s390x 
-			sed -i 's#ARCH =.*#ARCH = IBMz964#' Make.inc
-                %endif
-		%ifarch s390 
-			sed -i 's#ARCH =.*#ARCH = IBMz932#' Make.inc
-                %endif
-		sed -i 's#-march=z196#-march=z9-109 -mtune=z196#' Make.inc
-#		sed -i 's#-march=z10 -mtune=z196#-march=z9-109 -mtune=z196#' Make.inc
-		sed -i 's#-march=z10#-march=z9-109 -mtune=z10#' Make.inc
-		sed -i 's#-DATL_ARCH_IBMz196#-DATL_ARCH_IBMz9#' Make.inc
-		sed -i 's#-DATL_ARCH_IBMz10#-DATL_ARCH_IBMz9#' Make.inc
-#		sed -i 's#-DATL_ARCH_IBMz9#-DATL_ARCH_IBMz9#' Make.inc
-	elif [ "$type" = "z10" ]; then
-		%ifarch s390x 
-		
-#			cat Make.inc | grep "ARCH ="
-			sed -i 's#ARCH =.*#ARCH = IBMz1064#' Make.inc
-                %endif
-		%ifarch s390 
-			sed -i 's#ARCH =.*#ARCH = IBMz1032#' Make.inc
-#			cat Make.inc | grep "ARCH ="
-                %endif
-		sed -i 's#-march=z196#-march=z10#' Make.inc
-		sed -i 's#-mtune=z196##' Make.inc
-		sed -i 's#-march=z9-109#-march=z10#' Make.inc
-		sed -i 's#-DATL_ARCH_IBMz196#-DATL_ARCH_IBMz10#' Make.inc
-		sed -i 's#-DATL_ARCH_IBMz9#-DATL_ARCH_IBMz10#' Make.inc
-	elif [ "$type" = "z196" ]; then
-
-		%ifarch s390x 
-			sed -i 's#ARCH =.*#ARCH = IBMz19664#' Make.inc
-                %endif
-		%ifarch s390 
-			sed -i 's#ARCH =.*#ARCH = IBMz19632#' Make.inc
-                %endif
-		sed -i 's#-march=z196#-march=z10 -mtune=z196#' Make.inc
-		sed -i 's#-march=z10#-march=z10 -mtune=z196#' Make.inc
-		sed -i 's#-march=z9-109#-march=z10 -mtune=z196#' Make.inc
-		sed -i 's#-DATL_ARCH_IBMz10#-DATL_ARCH_IBMz196#' Make.inc
-		sed -i 's#-DATL_ARCH_IBMz9#-DATL_ARCH_IBMz196#' Make.inc
-	fi
-%endif
-
-%ifarch ppc
-	sed -i 's#ARCH =.*#ARCH = POWER332#' Make.inc
-	sed -i 's#-DATL_ARCH_POWER7#-DATL_ARCH_POWER3#g' Make.inc
-	sed -i 's#power7#power3#g' Make.inc
-	sed -i 's#-DATL_VSX##g' Make.inc
-	sed -i 's#-mvsx##g' Make.inc
-	sed -i 's#-DATL_AltiVec##g' Make.inc
-	sed -i 's#-m64#-m32#g' Make.inc
-%endif
 
 %endif
 	make build
@@ -452,6 +398,18 @@ for type in %{types}; do
 	fi
 done
 mkdir -p %{buildroot}%{_includedir}/atlas
+
+#create pkgconfig file
+mkdir -p %{buildroot}/%{_libdir}/pkgconfig/
+cat > %{buildroot}/%{_libdir}/pkgconfig/atlas.pc << DATA
+Name: %{name}
+Version: %{version}
+Description: %{summary}
+Cflags: -I%{_includedir}/atlas/
+Libs: -L%{_libdir}/atlas/ -lsatlas
+DATA
+
+
 
 ########################################################################
 %check
