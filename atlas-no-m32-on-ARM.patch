@@ -16,7 +16,7 @@ index 4cdf8d4..861b60e 100644
 +#endif
     return(sp);
  }
- char *GetStandardCompName(char *comp)
+ char *GetStandardCompName(char *comp, int f77)
 --- ATLAS/CONFIG/src/SpewMakeInc.c.orig	2015-04-11 10:03:47.177469952 +0100
 +++ ATLAS/CONFIG/src/SpewMakeInc.c	2015-04-11 10:05:05.030464216 +0100
 @@ -420,12 +420,14 @@

@@ -35,11 +35,11 @@
 %define libname		%mklibname %{name} %{major}
 
 Name:		atlas
-Version:	3.10.2
+Version:	3.10.3
 %if "%{?enable_native_atlas}" != "0"
   %define dist		.native
 %endif
-Release:        3%{?dist}
+Release:        1%{?dist}
 Summary:        Automatically Tuned Linear Algebra Software
 License:	BSD
 URL:		http://math-atlas.sourceforge.net/
@@ -65,12 +65,12 @@ Patch4:		atlas-throttling.patch
 #credits Lukas Slebodnik
 Patch5:		atlas-shared_libraries.patch
 
-Patch6:		atlas-affinity.patch
 
 Patch7:		0001-aarch64-support.patch
 Patch8:		atlas-genparse.patch
 
 BuildRequires:	gcc-gfortran
+#BuildRequires:	lapack-devel
 
 %description
 The ATLAS (Automatically Tuned Linear Algebra Software) project is an
@@ -264,7 +264,7 @@ fi
 %global mode -b %{__isa_bits}
 %global armflags %{nil}
 %if "%{?enable_native_atlas}" == "0"
-%define threads_option -t 4 
+%define threads_option -t 4
 %endif
 %endif
 
@@ -279,9 +279,9 @@ fi
 %patch4 -p1 -b .thrott
 %patch5 -p2 -b .sharedlib
 #affinity crashes with fewer processors than the builder but increases performance of locally builded library
-%if "%{?enable_native_atlas}" == "0"
-%patch6 -p1 -b .affinity
-%endif
+#% if "%{?enable_native_atlas}" == "0"
+#% patch6 -p1 -b .affinity
+#% endif
 %ifarch aarch64
 %patch7 -p1 -b .aarch64
 %endif
@@ -302,7 +302,6 @@ sed -i -e 's,-mfpu=vfpv3,,' tune/blas/gemm/CASES/*.flg
 %endif
 
 %build
-
 for type in %{types}; do
 	if [ "$type" = "base" ]; then
 		libname=atlas
@@ -312,7 +311,7 @@ for type in %{types}; do
 
 	mkdir -p %{_arch}_${type}
 	pushd %{_arch}_${type}
-	../configure  %{mode} %{?threads_option} %{?arch_option} -D c -DWALL -C acg 'gcc' -Fa alg '%{armflags} -g -Wa,--noexecstack -fPIC'\
+	../configure  %{mode} %{?threads_option} %{?arch_option} -D c -DWALL -Fa alg '%{armflags} -g -Wa,--noexecstack -fPIC'\
 	--cc=gcc					\
 	--prefix=%{buildroot}%{_prefix}			\
 	--incdir=%{buildroot}%{_includedir}		\
