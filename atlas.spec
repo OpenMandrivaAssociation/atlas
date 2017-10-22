@@ -21,9 +21,6 @@
   %define pr_z196		%(echo $((%{__isa_bits}+2)))
 %endif
 
-%define _enable_debug_packages	%{nil}
-%define debug_package		%{nil}
-
 # Keep these libraries private because they are not in %%{_libdir}
 %if %{_use_internal_dependency_generator}
 %define __noautoprov 'libsatlas\\.so\\.(.*)|libtatlas\\.so\\.(.*)'
@@ -32,7 +29,13 @@
 
 %define major		3
 %define libatlas	libatlas
+
 %define libname		%mklibname %{name} %{major}
+%define devname		%mklibname %{name} -d
+%define libname_sse2	%mklibname %{name}-sse2 %{major}
+%define devname_sse2	%mklibname %{name}-sse2 -d
+%define libname_sse3	%mklibname %{name}-sse3 %{major}
+%define devname_sse3	%mklibname %{name}-sse3 -d
 
 Name:		atlas
 Version:	3.10.3
@@ -116,9 +119,11 @@ see the documentation for information.
 %config(noreplace) /etc/ld.so.conf.d/atlas-%{_arch}.conf
 
 #-----------------------------------------------------------------------
-%package	-n %{libatlas}-devel
+
+%package	-n %{devname}
 Summary:        Development libraries for ATLAS
 Requires:       %{libname} = %{version}-%{release}
+Provides:	%{libname}-devel
 Requires(posttrans):	update-alternatives
 Requires(preun):	update-alternatives
 %ifarch x86_64
@@ -131,23 +136,23 @@ Obsoletes:	%{libatlas}-sse3-devel
 Obsoletes:	%{libatlas}-%{_arch}-devel
 %endif
 
-%description	-n %{libatlas}-devel
+%description	-n %{devname}
 This package contains headers for development with ATLAS
 (Automatically Tuned Linear Algebra Software).
 
-%posttrans	-n %{libatlas}-devel
+%posttrans	-n %{devname}
 if [ $1 -eq 0 ] ; then
     /usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel	\
 	%{_includedir}/atlas-%{_arch}-base %{pr_base}
 fi
 
-%preun		-n %{libatlas}-devel
+%preun		-n %{devname}
 if [ $1 -ge 0 ] ; then
     /usr/sbin/alternatives --remove atlas-devel				\
 	%{_includedir}/atlas-%{_arch}-base
 fi
 
-%files		-n %{libatlas}-devel
+%files		-n %{devname}
 %doc doc
 %{_libdir}/atlas/*.so
 %{_libdir}/pkgconfig/atlas.pc
@@ -158,47 +163,50 @@ fi
 ########################################################################
 %if "%{?enable_native_atlas}" == "0"
 %ifarch %{ix86}
+
 #-----------------------------------------------------------------------
-%package	-n %{libname}-sse2
+
+%package	-n %{libname_sse2}
 Summary:	ATLAS libraries for SSE2 extensions
 Provides:	%{libatlas} = %{version}-%{release}
 
-%description	-n %{libname}-sse2
+%description	-n %{libname_sse2}
 This package contains ATLAS (Automatically Tuned Linear Algebra Software)
 shared libraries compiled with optimizations for the SSE2
 extensions to the ix86 architecture. ATLAS builds with
 SSE(1) and SSE3 extensions also exist.
 
-%files		-n %{libname}-sse2
+%files		-n %{libname_sse2}
 %doc doc/README.dist
 %dir %{_libdir}/atlas-sse2
 %{_libdir}/atlas-sse2/*.so.*
 %config(noreplace) /etc/ld.so.conf.d/atlas-%{_arch}-sse2.conf
 
 #-----------------------------------------------------------------------
-%package	-n %{libatlas}-sse2-devel
+
+%package	-n %{devname_sse2}
 Summary:	Development files for ATLAS SSE2
 Requires(posttrans):	update-alternatives
 Requires(preun):	update-alternatives
 
-%description	-n %{libatlas}-sse2-devel
+%description	-n %{devname_sse2}
 This package contains ATLAS (Automatically Tuned Linear Algebra Software)
 headers for libraries compiled with optimizations for the SSE2 extensions
 to the ix86 architecture.
 
-%posttrans	-n %{libatlas}-sse2-devel
+%posttrans	-n %{devname_sse2}
 if [ $1 -eq 0 ] ; then
     /usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel	\
 	%{_includedir}/atlas-%{_arch}-sse2  %{pr_sse2}
 fi
 
-%preun		-n %{libatlas}-sse2-devel
+%preun		-n %{devname_sse2}
 if [ $1 -ge 0 ] ; then
     /usr/sbin/alternatives --remove atlas-devel				\
 	%{_includedir}/atlas-%{_arch}-sse2
 fi
 
-%files	-n %{libatlas}-sse2-devel
+%files	-n %{devname_sse2}
 %doc doc
 %{_libdir}/atlas-sse2/*.so
 %{_includedir}/atlas-%{_arch}-sse2/
@@ -206,54 +214,59 @@ fi
 %ghost %{_includedir}/atlas
 
 #-----------------------------------------------------------------------
-%package	-n %{libname}-sse3
+
+%package	-n %{libname_sse3}
 Summary:	ATLAS libraries for SSE3 extensions
 Provides:	%{libatlas} = %{version}-%{release}
 
-%description	-n %{libname}-sse3
+%description	-n %{libname_sse3}
 This package contains ATLAS (Automatically Tuned Linear Algebra Software)
 headers for libraries compiled with optimizations for the SSE3 extensions
 to the ix86 architecture.
 
-%files		-n %{libname}-sse3
+%files		-n %{libname_sse3}
 %doc doc/README.dist
 %dir %{_libdir}/atlas-sse3
 %{_libdir}/atlas-sse3/*.so.*
 %config(noreplace) /etc/ld.so.conf.d/atlas-%{_arch}-sse3.conf
 
 #-----------------------------------------------------------------------
-%package	-n %{libatlas}-sse3-devel
+
+%package	-n %{devname_sse3}
 Summary:	Development files for ATLAS SSE3
 Requires(posttrans):	update-alternatives
 Requires(preun):	update-alternatives
 
-%description	-n %{libatlas}-sse3-devel
+%description	-n %{devname_sse3}
 This package contains ATLAS (Automatically Tuned Linear Algebra Software)
 headers for libraries compiled with optimizations for the SSE3 extensions
 to the ix86 architecture.
 
-%posttrans	-n %{libatlas}-sse3-devel
+%posttrans	-n %{devname_sse3}
 if [ $1 -eq 0 ] ; then
     /usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel	\
 	%{_includedir}/atlas-%{_arch}-sse3  %{pr_sse3}
 fi
 
-%preun		-n %{libatlas}-sse3-devel
+%preun		-n %{devname_sse3}
 if [ $1 -ge 0 ] ; then
     /usr/sbin/alternatives --remove atlas-devel				\
 	%{_includedir}/atlas-%{_arch}-sse3
 fi
 
-%files		-n %{libatlas}-sse3-devel
+%files		-n %{devname_sse3}
 %doc doc
 %{_libdir}/atlas-sse3/*.so
 %{_includedir}/atlas-%{_arch}-sse3/
 %{_includedir}/*.h
 %ghost %{_includedir}/atlas
+
+#-----------------------------------------------------------------------
 %endif
 %endif
 
 ########################################################################
+
 %ifarch %{arm}
 #beware - arch constant can change between releases
 %define arch_option -A 46 
@@ -269,6 +282,7 @@ fi
 %endif
 
 ########################################################################
+
 %prep
 %setup -q -n ATLAS
 %ifarch s390 s390x
@@ -373,6 +387,7 @@ for type in %{types}; do
 done
 
 ########################################################################
+
 %install
 for type in %{types}; do
 	pushd %{_arch}_${type}
@@ -408,12 +423,12 @@ Cflags: -I%{_includedir}/atlas/
 Libs: -L%{_libdir}/atlas/ -lsatlas
 DATA
 
-
-
 ########################################################################
+
 %check
 for type in %{types}; do
 	pushd %{_arch}_${type}
 	make check ptcheck || :
 	popd
 done
+	
