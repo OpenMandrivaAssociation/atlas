@@ -6,19 +6,19 @@
 %define enable_native_atlas	0
 %define __isa_bits		32
 %ifarch x86_64 aarch64
-  %define __isa_bits		64
+	%define __isa_bits	64
 %endif
 
 %define types			base
 %define pr_base			%(echo $((%{__isa_bits}+0)))
 %ifarch %{ix86}
-  %define types			base sse2 sse3
-  %define pr_sse2		%(echo $((%{__isa_bits}+3)))
-  %define pr_sse3		%(echo $((%{__isa_bits}+4)))
+	%define types			base sse2 sse3
+	%define pr_sse2		%(echo $((%{__isa_bits}+3)))
+	%define pr_sse3		%(echo $((%{__isa_bits}+4)))
 %endif
 %ifarch s390 s390x
-  %define pr_z10		%(echo $((%{__isa_bits}+1)))
-  %define pr_z196		%(echo $((%{__isa_bits}+2)))
+	%define pr_z10		%(echo $((%{__isa_bits}+1)))
+	%define pr_z196		%(echo $((%{__isa_bits}+2)))
 %endif
 
 # Keep these libraries private because they are not in %%{_libdir}
@@ -40,10 +40,10 @@
 Name:		atlas
 Version:	3.10.3
 %if "%{?enable_native_atlas}" != "0"
-  %define dist		.native
+	%define dist	.native
 %endif
-Release:        1%{?dist}
-Summary:        Automatically Tuned Linear Algebra Software
+Release:	1%{?dist}
+Summary:	Automatically Tuned Linear Algebra Software
 License:	BSD
 URL:		http://math-atlas.sourceforge.net/
 Source0:	http://downloads.sourceforge.net/math-atlas/%{name}%{version}.tar.bz2
@@ -58,7 +58,7 @@ Source13:	IBMz964.tar.bz2
 Source14:	ARMv732NEON.tar.bz2
 Source100:	%{name}.rpmlintrc
 
-Patch1:		atlas-s390port.patch
+#Patch1:		atlas-s390port.patch
 Patch2:		atlas-no-m32-on-ARM.patch
 # Properly pass -melf_* to the linker with -Wl, fixes FTBFS bug 817552
 # https://sourceforge.net/tracker/?func=detail&atid=379484&aid=3555789&group_id=23725
@@ -69,7 +69,7 @@ Patch4:		atlas-throttling.patch
 Patch5:		atlas-shared_libraries.patch
 
 
-Patch7:		0001-aarch64-support.patch
+#Patch7:		0001-aarch64-support.patch
 Patch8:		atlas-genparse.patch
 
 BuildRequires:	gcc-gfortran
@@ -108,7 +108,7 @@ compile-time optimizations and tend to be specific to a given hardware
 configuration. In order to package ATLAS some compromises
 are necessary so that good performance can be obtained on a variety
 of hardware. This set of ATLAS binary packages is therefore not
-necessarily optimal for any specific hardware configuration.  However,
+necessarily optimal for any specific hardware configuration. However,
 the source package can be used to compile customized ATLAS packages;
 see the documentation for information.
 
@@ -121,8 +121,8 @@ see the documentation for information.
 #-----------------------------------------------------------------------
 
 %package	-n %{devname}
-Summary:        Development libraries for ATLAS
-Requires:       %{libname} = %{version}-%{release}
+Summary:	Development libraries for ATLAS
+Requires:	%{libname} = %{version}-%{release}
 Provides:	%{libname}-devel
 Requires(posttrans):	update-alternatives
 Requires(preun):	update-alternatives
@@ -142,13 +142,13 @@ This package contains headers for development with ATLAS
 
 %posttrans	-n %{devname}
 if [ $1 -eq 0 ] ; then
-    /usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel	\
+	/usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel	\
 	%{_includedir}/atlas-%{_arch}-base %{pr_base}
 fi
 
 %preun		-n %{devname}
 if [ $1 -ge 0 ] ; then
-    /usr/sbin/alternatives --remove atlas-devel				\
+	/usr/sbin/alternatives --remove atlas-devel				\
 	%{_includedir}/atlas-%{_arch}-base
 fi
 
@@ -196,13 +196,13 @@ to the ix86 architecture.
 
 %posttrans	-n %{devname_sse2}
 if [ $1 -eq 0 ] ; then
-    /usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel	\
-	%{_includedir}/atlas-%{_arch}-sse2  %{pr_sse2}
+	/usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel	\
+	%{_includedir}/atlas-%{_arch}-sse2 %{pr_sse2}
 fi
 
 %preun		-n %{devname_sse2}
 if [ $1 -ge 0 ] ; then
-    /usr/sbin/alternatives --remove atlas-devel				\
+	/usr/sbin/alternatives --remove atlas-devel				\
 	%{_includedir}/atlas-%{_arch}-sse2
 fi
 
@@ -244,13 +244,13 @@ to the ix86 architecture.
 
 %posttrans	-n %{devname_sse3}
 if [ $1 -eq 0 ] ; then
-    /usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel	\
-	%{_includedir}/atlas-%{_arch}-sse3  %{pr_sse3}
+	/usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel	\
+	%{_includedir}/atlas-%{_arch}-sse3 %{pr_sse3}
 fi
 
 %preun		-n %{devname_sse3}
 if [ $1 -ge 0 ] ; then
-    /usr/sbin/alternatives --remove atlas-devel				\
+	/usr/sbin/alternatives --remove atlas-devel				\
 	%{_includedir}/atlas-%{_arch}-sse3
 fi
 
@@ -285,9 +285,9 @@ fi
 
 %prep
 %setup -q -n ATLAS
-%ifarch s390 s390x
-%patch1 -p1 -b .s390
-%endif
+#% ifarch s390 s390x
+#% patch1 -p1 -b .s390
+#% endif
 %patch2 -p1 -b .m32arm
 %patch3 -p1 -b .melf
 %patch4 -p1 -b .thrott
@@ -296,9 +296,9 @@ fi
 #% if "%{?enable_native_atlas}" == "0"
 #% patch6 -p1 -b .affinity
 #% endif
-%ifarch aarch64
-%patch7 -p1 -b .aarch64
-%endif
+#% ifarch aarch64
+#% patch7 -p1 -b .aarch64
+#% endif
 %patch8 -p1 -b .genparse
 
 cp %{SOURCE1} CONFIG/ARCHS/
@@ -325,7 +325,7 @@ for type in %{types}; do
 
 	mkdir -p %{_arch}_${type}
 	pushd %{_arch}_${type}
-	../configure  %{mode} %{?threads_option} %{?arch_option} -D c -DWALL -Fa alg '%{armflags} -g -Wa,--noexecstack -fPIC'\
+	../configure %{mode} %{?threads_option} %{?arch_option} -D c -DWALL -Fa alg '%{armflags} -g -Wa,--noexecstack -fPIC'\
 	--cc=gcc					\
 	--prefix=%{buildroot}%{_prefix}			\
 	--incdir=%{buildroot}%{_includedir}		\
@@ -361,7 +361,7 @@ for type in %{types}; do
 		#sed -i 's#-DATL_SSE3 -DATL_SSE2 -DATL_SSE1##' Make.inc
 		sed -i 's#-DATL_SSE3##' Make.inc
 		sed -i 's#-DATL_SSE2##' Make.inc
-		sed -i 's#-DATL_SSE1##' Make.inc  
+		sed -i 's#-DATL_SSE1##' Make.inc
 		sed -i 's#-mfpmath=sse -msse3#-mfpmath=387#' Make.inc 
 	elif [ "$type" = "sse" ]; then
 		sed -i 's#ARCH =.*#ARCH = PIII32SSE1#' Make.inc
@@ -392,7 +392,7 @@ done
 for type in %{types}; do
 	pushd %{_arch}_${type}
 	make DESTDIR=%{buildroot} install
-        mv %{buildroot}%{_includedir}/atlas %{buildroot}%{_includedir}/atlas-%{_arch}-${type}
+	mv %{buildroot}%{_includedir}/atlas %{buildroot}%{_includedir}/atlas-%{_arch}-${type}
 	if [ "$type" = "base" ]; then
 		cp -pr lib/*.so* %{buildroot}%{_libdir}/atlas/
 		rm -f %{buildroot}%{_libdir}/atlas/*.a
