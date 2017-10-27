@@ -42,7 +42,7 @@ Version:	3.10.3
 %if "%{?enable_native_atlas}" != "0"
 	%define dist	.native
 %endif
-Release:	1%{?dist}
+Release:	1.1%{?dist}
 Summary:	Automatically Tuned Linear Algebra Software
 License:	BSD
 URL:		http://math-atlas.sourceforge.net/
@@ -86,14 +86,15 @@ well as a few routines from LAPACK.
 %package	-n %{libname}
 Summary:	Automatically Tuned Linear Algebra Software
 Provides:	%{libatlas} = %{version}-%{release}
+Obsoletes:	%{libatlas}-devel
 %ifarch x86_64
-Obsoletes:	%{libname}-sse2
+Obsoletes:	%{libatlas}-sse2
 %endif
 %ifarch x86_64
-Obsoletes:	%{libname}-sse3
+Obsoletes:	%{libatlas}-sse3
 %endif
 %ifnarch %{ix86} x86_64
-Obsoletes:	%{libname}-%{_arch}
+Obsoletes:	%{libatlas}-%{_arch}
 %endif
 
 %description	-n %{libname}
@@ -123,7 +124,7 @@ see the documentation for information.
 %package	-n %{devname}
 Summary:	Development libraries for ATLAS
 Requires:	%{libname} = %{version}-%{release}
-Provides:	%{libname}-devel
+Provides:	%{libatlas}-devel
 Requires(posttrans):	update-alternatives
 Requires(preun):	update-alternatives
 %ifarch x86_64
