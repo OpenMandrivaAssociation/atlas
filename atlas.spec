@@ -22,10 +22,10 @@
 %endif
 
 # Keep these libraries private because they are not in %%{_libdir}
-%if %{_use_internal_dependency_generator}
-%define __noautoprov 'libsatlas\\.so\\.(.*)|libtatlas\\.so\\.(.*)'
-%define __noautoreq 'libsatlas\\.so\\.(.*)|libtatlas\\.so\\.(.*)'
-%endif
+#% if %{_use_internal_dependency_generator}
+#% define __noautoprov 'libsatlas\\.so\\.(.*)|libtatlas\\.so\\.(.*)'
+#% define __noautoreq 'libsatlas\\.so\\.(.*)|libtatlas\\.so\\.(.*)'
+#% endif
 
 %define major		3
 %define libatlas	libatlas
@@ -42,7 +42,7 @@ Version:	3.10.3
 %if "%{?enable_native_atlas}" != "0"
 	%define dist	.native
 %endif
-Release:	1.1%{?dist}
+Release:	1.2%{?dist}
 Summary:	Automatically Tuned Linear Algebra Software
 License:	BSD
 URL:		http://math-atlas.sourceforge.net/
