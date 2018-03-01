@@ -270,7 +270,7 @@ fi
 
 %ifarch %{arm}
 #beware - arch constant can change between releases
-%define arch_option -A 46 
+%define arch_option -A 46
 %define threads_option -t 2
 %global armflags -DATL_ARM_HARDFP=1
 %global mode %{nil}
@@ -339,19 +339,21 @@ for type in %{types}; do
 #		sed -i 's#ARCH =.*#ARCH = HAMMER64SSE2#' Make.inc
 		sed -i 's#ARCH =.*#ARCH = HAMMER64SSE3#' Make.inc
 #		sed -i 's#-DATL_SSE3##' Make.inc
-		sed -i 's#-DATL_AVX##' Make.inc 
-#		sed -i 's#-msse3#-msse2#' Make.inc 
-		sed -i 's#-mavx#-msse3#' Make.inc
+		sed -i 's#-DATL_AVX##' Make.inc
+#		sed -i 's#-msse3#-msse2#' Make.inc
+#		sed -i 's#-mavx#-msse3#' Make.inc
+		sed -i 's#-mavx2#-msse3#' Make.inc
 		sed -i 's#MAC##' Make.inc
-		echo 'base makefile edited' 
-#		sed -i 's#PMAKE = $(MAKE) .*#PMAKE = $(MAKE) -j 1#' Make.inc 
+		echo 'base makefile edited'
+#		sed -i 's#PMAKE = $(MAKE) .*#PMAKE = $(MAKE) -j 1#' Make.inc
 	elif [ "$type" = "sse3" ]; then
 #		sed -i 's#ARCH =.*#ARCH = Corei264AVX#' Make.inc
 #		sed -i 's#PMAKE = $(MAKE) .*#PMAKE = $(MAKE) -j 1#' Make.inc
 		sed -i 's#-DATL_AVX##' Make.inc
 		sed -i 's#-DATL_SSE2##' Make.inc
-		sed -i 's#-mavx#-msse2#' Make.inc 
-		sed -i 's#-msse3#-msse2#' Make.inc 
+#		sed -i 's#-mavx#-msse2#' Make.inc
+		sed -i 's#-mavx2#-msse2#' Make.inc
+		sed -i 's#-msse3#-msse2#' Make.inc
 		echo 'sse makefile edited'
 	fi
 %endif
@@ -363,16 +365,16 @@ for type in %{types}; do
 		sed -i 's#-DATL_SSE3##' Make.inc
 		sed -i 's#-DATL_SSE2##' Make.inc
 		sed -i 's#-DATL_SSE1##' Make.inc
-		sed -i 's#-mfpmath=sse -msse3#-mfpmath=387#' Make.inc 
+		sed -i 's#-mfpmath=sse -msse3#-mfpmath=387#' Make.inc
 	elif [ "$type" = "sse" ]; then
 		sed -i 's#ARCH =.*#ARCH = PIII32SSE1#' Make.inc
-		sed -i 's#-DATL_SSE3#-DATL_SSE1#' Make.inc 
-		sed -i 's#-msse3#-msse#' Make.inc 
+		sed -i 's#-DATL_SSE3#-DATL_SSE1#' Make.inc
+		sed -i 's#-msse3#-msse#' Make.inc
 	elif [ "$type" = "sse2" ]; then
 #		sed -i 's#ARCH =.*#ARCH = P432SSE2#' Make.inc
 		sed -i 's#ARCH =.*#ARCH = x86SSE232SSE2#' Make.inc
-		sed -i 's#-DATL_SSE3#-DATL_SSE2#' Make.inc 
-		sed -i 's#-msse3#-msse2#' Make.inc 
+		sed -i 's#-DATL_SSE3#-DATL_SSE2#' Make.inc
+		sed -i 's#-msse3#-msse2#' Make.inc
 	elif [ "$type" = "sse3" ]; then
 		sed -i 's#ARCH =.*#ARCH = P4E32SSE3#' Make.inc
 	fi
@@ -432,4 +434,4 @@ for type in %{types}; do
 	make check ptcheck || :
 	popd
 done
-	
+
