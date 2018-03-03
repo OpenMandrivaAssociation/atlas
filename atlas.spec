@@ -42,7 +42,7 @@ Version:	3.10.3
 %if "%{?enable_native_atlas}" != "0"
 	%define dist	.native
 %endif
-Release:	1.2%{?dist}
+Release:	1.3%{?dist}
 Summary:	Automatically Tuned Linear Algebra Software
 License:	BSD
 Group:		Sciences/Mathematics
@@ -343,7 +343,8 @@ for type in %{types}; do
 		sed -i 's#-DATL_AVX##' Make.inc
 #		sed -i 's#-msse3#-msse2#' Make.inc
 #		sed -i 's#-mavx#-msse3#' Make.inc
-		sed -i 's#-mavx2#-msse3#' Make.inc
+		sed -i 's#-mavx[0-9].*#-msse3#' Make.inc
+		sed -i 's#-mavx#-msse3#' Make.inc
 		sed -i 's#MAC##' Make.inc
 		echo 'base makefile edited'
 #		sed -i 's#PMAKE = $(MAKE) .*#PMAKE = $(MAKE) -j 1#' Make.inc
@@ -352,8 +353,8 @@ for type in %{types}; do
 #		sed -i 's#PMAKE = $(MAKE) .*#PMAKE = $(MAKE) -j 1#' Make.inc
 		sed -i 's#-DATL_AVX##' Make.inc
 		sed -i 's#-DATL_SSE2##' Make.inc
-#		sed -i 's#-mavx#-msse2#' Make.inc
-		sed -i 's#-mavx2#-msse2#' Make.inc
+		sed -i 's#-mavx[0-9].*#-msse2#' Make.inc
+		sed -i 's#-mavx#-msse2#' Make.inc
 		sed -i 's#-msse3#-msse2#' Make.inc
 		echo 'sse makefile edited'
 	fi
