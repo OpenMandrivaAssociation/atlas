@@ -45,6 +45,7 @@ Version:	3.10.3
 Release:	1.2%{?dist}
 Summary:	Automatically Tuned Linear Algebra Software
 License:	BSD
+Group:		Sciences/Mathematics
 URL:		http://math-atlas.sourceforge.net/
 Source0:	http://downloads.sourceforge.net/math-atlas/%{name}%{version}.tar.bz2
 Source1:	PPRO32.tgz
