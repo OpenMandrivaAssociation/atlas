@@ -335,6 +335,7 @@ for type in %{types}; do
 	--with-netlib-lapack-tarfile=%{SOURCE10}
 
 %if "%{?enable_native_atlas}" == "0"
+cat Make.inc # enable fof debug only
 %ifarch x86_64
 	if [ "$type" = "base" ]; then
 #		sed -i 's#ARCH =.*#ARCH = HAMMER64SSE2#' Make.inc
