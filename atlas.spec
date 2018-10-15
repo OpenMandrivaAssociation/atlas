@@ -6,7 +6,7 @@
 
 %define enable_native_atlas	0
 %define __isa_bits		32
-%ifarch x86_64 aarch64 znver1
+%ifarch %{x86_64} aarch64
 	%define __isa_bits	64
 %endif
 
@@ -89,14 +89,14 @@ well as a few routines from LAPACK.
 Summary:	Automatically Tuned Linear Algebra Software
 Provides:	%{libatlas} = %{version}-%{release}
 Obsoletes:	%{libatlas}-devel
-%ifarch x86_64 znver1
-Obsoletes:	%{libatlas}-sse2
+%ifarch %{x86_64}
+Obsoletes:	%{libatlas}-sse2 < %{EVRD}
 %endif
-%ifarch x86_64 znver1
-Obsoletes:	%{libatlas}-sse3
+%ifarch %{x86_64}
+Obsoletes:	%{libatlas}-sse3 < %{EVRD}
 %endif
-%ifnarch %{ix86} x86_64 znver1
-Obsoletes:	%{libatlas}-%{_arch}
+%ifnarch %{ix86} %{x86_64}
+Obsoletes:	%{libatlas}-%{_arch} < %{EVRD}
 %endif
 
 %description	-n %{libname}
@@ -129,13 +129,13 @@ Requires:	%{libname} = %{version}-%{release}
 Provides:	%{libatlas}-devel
 Requires(posttrans):	update-alternatives
 Requires(preun):	update-alternatives
-%ifarch x86_64 znver1
+%ifarch %{x86_64}
 Obsoletes:	%{libatlas}-sse2-devel
 %endif
-%ifarch x86_64 znver1
+%ifarch %{x86_64}
 Obsoletes:	%{libatlas}-sse3-devel
 %endif
-%ifnarch %{ix86} x86_64 znver1
+%ifnarch %{ix86} %{x86_64}
 Obsoletes:	%{libatlas}-%{_arch}-devel
 %endif
 
@@ -337,7 +337,7 @@ for type in %{types}; do
 
 %if "%{?enable_native_atlas}" == "0"
 cat Make.inc # enable fof debug only
-%ifarch x86_64 znver1
+%ifarch %{x86_64}
 	if [ "$type" = "base" ]; then
 #		sed -i 's#ARCH =.*#ARCH = HAMMER64SSE2#' Make.inc
 		sed -i 's#ARCH =.*#ARCH = HAMMER64SSE3#' Make.inc
