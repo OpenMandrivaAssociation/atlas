@@ -43,7 +43,7 @@ Version:	3.10.3
 %if "%{?enable_native_atlas}" != "0"
 	%define dist	.native
 %endif
-Release:	1.4%{?dist}
+Release:	1.5%{?dist}
 Summary:	Automatically Tuned Linear Algebra Software
 License:	BSD
 Group:		Sciences/Mathematics
@@ -73,6 +73,8 @@ Patch5:		atlas-shared_libraries.patch
 
 #Patch7:		0001-aarch64-support.patch
 Patch8:		atlas-genparse.patch
+# Unbundle LAPACK (BZ #1181369)
+Patch9:		atlas.3.10.1-unbundle.patch
 
 BuildRequires:	gcc-gfortran
 #BuildRequires:	lapack-devel
@@ -85,7 +87,7 @@ Fortran77 interfaces to a portably efficient BLAS implementation, as
 well as a few routines from LAPACK.
 
 #-----------------------------------------------------------------------
-%package	-n %{libname}
+%package -n %{libname}
 Summary:	Automatically Tuned Linear Algebra Software
 Provides:	%{libatlas} = %{version}-%{release}
 Obsoletes:	%{libatlas}-devel
@@ -99,7 +101,7 @@ Obsoletes:	%{libatlas}-sse3 < %{EVRD}
 Obsoletes:	%{libatlas}-%{_arch} < %{EVRD}
 %endif
 
-%description	-n %{libname}
+%description -n %{libname}
 The ATLAS (Automatically Tuned Linear Algebra Software) project is an
 ongoing research effort focusing on applying empirical techniques in
 order to provide portable performance. At present, it provides C and
@@ -115,7 +117,7 @@ necessarily optimal for any specific hardware configuration. However,
 the source package can be used to compile customized ATLAS packages;
 see the documentation for information.
 
-%files		-n %{libname}
+%files -n %{libname}
 %doc doc/README.dist
 %dir %{_libdir}/atlas
 %{_libdir}/atlas/*.so.*
@@ -123,7 +125,7 @@ see the documentation for information.
 
 #-----------------------------------------------------------------------
 
-%package	-n %{devname}
+%package -n %{devname}
 Summary:	Development libraries for ATLAS
 Requires:	%{libname} = %{version}-%{release}
 Provides:	%{libatlas}-devel
@@ -139,23 +141,23 @@ Obsoletes:	%{libatlas}-sse3-devel
 Obsoletes:	%{libatlas}-%{_arch}-devel
 %endif
 
-%description	-n %{devname}
+%description -n %{devname}
 This package contains headers for development with ATLAS
 (Automatically Tuned Linear Algebra Software).
 
-%posttrans	-n %{devname}
+%posttrans -n %{devname}
 if [ $1 -eq 0 ] ; then
 	/usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel	\
 	%{_includedir}/atlas-%{_arch}-base %{pr_base}
 fi
 
-%preun		-n %{devname}
+%preun -n %{devname}
 if [ $1 -ge 0 ] ; then
 	/usr/sbin/alternatives --remove atlas-devel				\
 	%{_includedir}/atlas-%{_arch}-base
 fi
 
-%files		-n %{devname}
+%files -n %{devname}
 %doc doc
 %{_libdir}/atlas/*.so
 %{_libdir}/pkgconfig/atlas.pc
@@ -169,17 +171,17 @@ fi
 
 #-----------------------------------------------------------------------
 
-%package	-n %{libname_sse2}
+%package -n %{libname_sse2}
 Summary:	ATLAS libraries for SSE2 extensions
 Provides:	%{libatlas} = %{version}-%{release}
 
-%description	-n %{libname_sse2}
+%description -n %{libname_sse2}
 This package contains ATLAS (Automatically Tuned Linear Algebra Software)
 shared libraries compiled with optimizations for the SSE2
 extensions to the ix86 architecture. ATLAS builds with
 SSE(1) and SSE3 extensions also exist.
 
-%files		-n %{libname_sse2}
+%files -n %{libname_sse2}
 %doc doc/README.dist
 %dir %{_libdir}/atlas-sse2
 %{_libdir}/atlas-sse2/*.so.*
@@ -187,29 +189,29 @@ SSE(1) and SSE3 extensions also exist.
 
 #-----------------------------------------------------------------------
 
-%package	-n %{devname_sse2}
+%package -n %{devname_sse2}
 Summary:	Development files for ATLAS SSE2
 Requires(posttrans):	update-alternatives
 Requires(preun):	update-alternatives
 
-%description	-n %{devname_sse2}
+%description -n %{devname_sse2}
 This package contains ATLAS (Automatically Tuned Linear Algebra Software)
 headers for libraries compiled with optimizations for the SSE2 extensions
 to the ix86 architecture.
 
-%posttrans	-n %{devname_sse2}
+%posttrans -n %{devname_sse2}
 if [ $1 -eq 0 ] ; then
 	/usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel	\
 	%{_includedir}/atlas-%{_arch}-sse2 %{pr_sse2}
 fi
 
-%preun		-n %{devname_sse2}
+%preun -n %{devname_sse2}
 if [ $1 -ge 0 ] ; then
 	/usr/sbin/alternatives --remove atlas-devel				\
 	%{_includedir}/atlas-%{_arch}-sse2
 fi
 
-%files	-n %{devname_sse2}
+%files -n %{devname_sse2}
 %doc doc
 %{_libdir}/atlas-sse2/*.so
 %{_includedir}/atlas-%{_arch}-sse2/
@@ -218,16 +220,16 @@ fi
 
 #-----------------------------------------------------------------------
 
-%package	-n %{libname_sse3}
+%package -n %{libname_sse3}
 Summary:	ATLAS libraries for SSE3 extensions
 Provides:	%{libatlas} = %{version}-%{release}
 
-%description	-n %{libname_sse3}
+%description -n %{libname_sse3}
 This package contains ATLAS (Automatically Tuned Linear Algebra Software)
 headers for libraries compiled with optimizations for the SSE3 extensions
 to the ix86 architecture.
 
-%files		-n %{libname_sse3}
+%files -n %{libname_sse3}
 %doc doc/README.dist
 %dir %{_libdir}/atlas-sse3
 %{_libdir}/atlas-sse3/*.so.*
@@ -235,29 +237,29 @@ to the ix86 architecture.
 
 #-----------------------------------------------------------------------
 
-%package	-n %{devname_sse3}
+%package -n %{devname_sse3}
 Summary:	Development files for ATLAS SSE3
 Requires(posttrans):	update-alternatives
 Requires(preun):	update-alternatives
 
-%description	-n %{devname_sse3}
+%description -n %{devname_sse3}
 This package contains ATLAS (Automatically Tuned Linear Algebra Software)
 headers for libraries compiled with optimizations for the SSE3 extensions
 to the ix86 architecture.
 
-%posttrans	-n %{devname_sse3}
+%posttrans -n %{devname_sse3}
 if [ $1 -eq 0 ] ; then
 	/usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel	\
 	%{_includedir}/atlas-%{_arch}-sse3 %{pr_sse3}
 fi
 
-%preun		-n %{devname_sse3}
+%preun -n %{devname_sse3}
 if [ $1 -ge 0 ] ; then
 	/usr/sbin/alternatives --remove atlas-devel				\
 	%{_includedir}/atlas-%{_arch}-sse3
 fi
 
-%files		-n %{devname_sse3}
+%files -n %{devname_sse3}
 %doc doc
 %{_libdir}/atlas-sse3/*.so
 %{_includedir}/atlas-%{_arch}-sse3/
@@ -303,6 +305,7 @@ fi
 #% patch7 -p1 -b .aarch64
 #% endif
 %patch8 -p1 -b .genparse
+%patch9 -p1
 
 cp %{SOURCE1} CONFIG/ARCHS/
 cp %{SOURCE3} doc
@@ -310,6 +313,7 @@ cp %{SOURCE11} CONFIG/ARCHS/
 cp %{SOURCE12} CONFIG/ARCHS/
 cp %{SOURCE13} CONFIG/ARCHS/
 cp %{SOURCE14} CONFIG/ARCHS/
+
 %ifarch %{arm}
 # Set arm flags in atlcomp.txt
 sed -i -e 's,-mfpu=vfpv3,-mfpu=neon,' CONFIG/src/atlcomp.txt
