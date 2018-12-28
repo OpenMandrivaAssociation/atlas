@@ -77,7 +77,7 @@ Patch8:		atlas-genparse.patch
 Patch9:		atlas.3.10.1-unbundle.patch
 
 BuildRequires:	gcc-gfortran
-#BuildRequires:	lapack-devel
+BuildRequires:	lapack-devel
 
 %description
 The ATLAS (Automatically Tuned Linear Algebra Software) project is an
@@ -336,8 +336,10 @@ for type in %{types}; do
 	--cc=gcc					\
 	--prefix=%{buildroot}%{_prefix}			\
 	--incdir=%{buildroot}%{_includedir}		\
-	--libdir=%{buildroot}%{_libdir}/${libname}	\
-	--with-netlib-lapack-tarfile=%{SOURCE10}
+	--libdir=%{buildroot}%{_libdir}/${libname}
+#	--with-netlib-lapack-tarfile=%{SOURCE10}
+
+        sed -i 's#SLAPACKlib.*#SLAPACKlib = %{_libdir}/liblapack.so#' Make.inc
 
 %if "%{?enable_native_atlas}" == "0"
 cat Make.inc # enable fof debug only
