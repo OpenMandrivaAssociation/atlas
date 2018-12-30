@@ -12,15 +12,6 @@
 
 %define types			base
 %define pr_base			%(echo $((%{__isa_bits}+0)))
-%ifarch %{ix86}
-	%define types			base sse2 sse3
-	%define pr_sse2		%(echo $((%{__isa_bits}+3)))
-	%define pr_sse3		%(echo $((%{__isa_bits}+4)))
-%endif
-%ifarch s390 s390x
-	%define pr_z10		%(echo $((%{__isa_bits}+1)))
-	%define pr_z196		%(echo $((%{__isa_bits}+2)))
-%endif
 
 # Keep these libraries private because they are not in %%{_libdir}
 #% if %{_use_internal_dependency_generator}
@@ -33,10 +24,6 @@
 
 %define libname		%mklibname %{name} %{major}
 %define devname		%mklibname %{name} -d
-%define libname_sse2	%mklibname %{name}-sse2 %{major}
-%define devname_sse2	%mklibname %{name}-sse2 -d
-%define libname_sse3	%mklibname %{name}-sse3 %{major}
-%define devname_sse3	%mklibname %{name}-sse3 -d
 
 Name:		atlas
 Version:	3.10.3
@@ -60,7 +47,6 @@ Source13:	IBMz964.tar.bz2
 Source14:	ARMv732NEON.tar.bz2
 Source100:	%{name}.rpmlintrc
 
-#Patch1:		atlas-s390port.patch
 Patch2:		atlas-no-m32-on-ARM.patch
 # Properly pass -melf_* to the linker with -Wl, fixes FTBFS bug 817552
 # https://sourceforge.net/tracker/?func=detail&atid=379484&aid=3555789&group_id=23725
@@ -91,12 +77,8 @@ well as a few routines from LAPACK.
 Summary:	Automatically Tuned Linear Algebra Software
 Provides:	%{libatlas} = %{version}-%{release}
 Obsoletes:	%{libatlas}-devel
-%ifarch %{x86_64}
 Obsoletes:	%{libatlas}-sse2 < %{EVRD}
-%endif
-%ifarch %{x86_64}
 Obsoletes:	%{libatlas}-sse3 < %{EVRD}
-%endif
 %ifnarch %{ix86} %{x86_64}
 Obsoletes:	%{libatlas}-%{_arch} < %{EVRD}
 %endif
@@ -131,12 +113,8 @@ Requires:	%{libname} = %{version}-%{release}
 Provides:	%{libatlas}-devel
 Requires(posttrans):	update-alternatives
 Requires(preun):	update-alternatives
-%ifarch %{x86_64}
 Obsoletes:	%{libatlas}-sse2-devel
-%endif
-%ifarch %{x86_64}
 Obsoletes:	%{libatlas}-sse3-devel
-%endif
 %ifnarch %{ix86} %{x86_64}
 Obsoletes:	%{libatlas}-%{_arch}-devel
 %endif
@@ -165,134 +143,13 @@ fi
 %{_includedir}/*.h
 %ghost %{_includedir}/atlas
 
-########################################################################
-%if "%{?enable_native_atlas}" == "0"
-%ifarch %{ix86}
-
-#-----------------------------------------------------------------------
-
-%package -n %{libname_sse2}
-Summary:	ATLAS libraries for SSE2 extensions
-Provides:	%{libatlas} = %{version}-%{release}
-
-%description -n %{libname_sse2}
-This package contains ATLAS (Automatically Tuned Linear Algebra Software)
-shared libraries compiled with optimizations for the SSE2
-extensions to the ix86 architecture. ATLAS builds with
-SSE(1) and SSE3 extensions also exist.
-
-%files -n %{libname_sse2}
-%doc doc/README.dist
-%dir %{_libdir}/atlas-sse2
-%{_libdir}/atlas-sse2/*.so.*
-%config(noreplace) /etc/ld.so.conf.d/atlas-%{_arch}-sse2.conf
-
-#-----------------------------------------------------------------------
-
-%package -n %{devname_sse2}
-Summary:	Development files for ATLAS SSE2
-Requires(posttrans):	update-alternatives
-Requires(preun):	update-alternatives
-
-%description -n %{devname_sse2}
-This package contains ATLAS (Automatically Tuned Linear Algebra Software)
-headers for libraries compiled with optimizations for the SSE2 extensions
-to the ix86 architecture.
-
-%posttrans -n %{devname_sse2}
-if [ $1 -eq 0 ] ; then
-	/usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel	\
-	%{_includedir}/atlas-%{_arch}-sse2 %{pr_sse2}
-fi
-
-%preun -n %{devname_sse2}
-if [ $1 -ge 0 ] ; then
-	/usr/sbin/alternatives --remove atlas-devel				\
-	%{_includedir}/atlas-%{_arch}-sse2
-fi
-
-%files -n %{devname_sse2}
-%doc doc
-%{_libdir}/atlas-sse2/*.so
-%{_includedir}/atlas-%{_arch}-sse2/
-%{_includedir}/*.h
-%ghost %{_includedir}/atlas
-
-#-----------------------------------------------------------------------
-
-%package -n %{libname_sse3}
-Summary:	ATLAS libraries for SSE3 extensions
-Provides:	%{libatlas} = %{version}-%{release}
-
-%description -n %{libname_sse3}
-This package contains ATLAS (Automatically Tuned Linear Algebra Software)
-headers for libraries compiled with optimizations for the SSE3 extensions
-to the ix86 architecture.
-
-%files -n %{libname_sse3}
-%doc doc/README.dist
-%dir %{_libdir}/atlas-sse3
-%{_libdir}/atlas-sse3/*.so.*
-%config(noreplace) /etc/ld.so.conf.d/atlas-%{_arch}-sse3.conf
-
-#-----------------------------------------------------------------------
-
-%package -n %{devname_sse3}
-Summary:	Development files for ATLAS SSE3
-Requires(posttrans):	update-alternatives
-Requires(preun):	update-alternatives
-
-%description -n %{devname_sse3}
-This package contains ATLAS (Automatically Tuned Linear Algebra Software)
-headers for libraries compiled with optimizations for the SSE3 extensions
-to the ix86 architecture.
-
-%posttrans -n %{devname_sse3}
-if [ $1 -eq 0 ] ; then
-	/usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel	\
-	%{_includedir}/atlas-%{_arch}-sse3 %{pr_sse3}
-fi
-
-%preun -n %{devname_sse3}
-if [ $1 -ge 0 ] ; then
-	/usr/sbin/alternatives --remove atlas-devel				\
-	%{_includedir}/atlas-%{_arch}-sse3
-fi
-
-%files -n %{devname_sse3}
-%doc doc
-%{_libdir}/atlas-sse3/*.so
-%{_includedir}/atlas-%{_arch}-sse3/
-%{_includedir}/*.h
-%ghost %{_includedir}/atlas
-
-#-----------------------------------------------------------------------
-%endif
-%endif
 
 ########################################################################
-
-%ifarch %{arm}
-#beware - arch constant can change between releases
-%define arch_option -A 46
-%define threads_option -t 2
-%global armflags -DATL_ARM_HARDFP=1
-%global mode %{nil}
-%else
-%global mode -b %{__isa_bits}
-%global armflags %{nil}
-%if "%{?enable_native_atlas}" == "0"
-%define threads_option -t 4
-%endif
-%endif
 
 ########################################################################
 
 %prep
 %setup -q -n ATLAS
-#% ifarch s390 s390x
-#% patch1 -p1 -b .s390
-#% endif
 %patch2 -p1 -b .m32arm
 %patch3 -p1 -b .melf
 %patch4 -p1 -b .thrott
@@ -323,16 +180,58 @@ sed -i -e 's,-mfpu=vfpv3,,' tune/blas/gemm/CASES/*.flg
 %endif
 
 %build
+
+%ifarch %{arm}
+%global mode %{nil}
+%else
+%global mode -b %{__isa_bits}
+%endif
+
+%define arg_options %{nil}
+%define flags %{nil}
+%define threads_option "-t 2"
+
+#Target architectures for the 'base' versions
+
+%ifarch %{x86_64}
+%define flags %{nil}
+%define base_options "-A HAMMER -V 896"
+%endif
+
+%ifarch %ix86
+%define flags %{nil}
+%define base_options "-A PIII -V 512"
+%endif
+
+%ifarch %{arm}
+%define flags "-DATL_ARM_HARDFP=1"
+%define base_options "-A ARMa7 -V 1"
+%endif
+
+%ifarch aarch64
+%define flags %{nil}
+%define base_options "-A ARM64a53 -V 1"
+%endif
+
+%if "%{?enable_native_atlas}" != "0"
+%define    threads_option %{nil}
+%define base_options %{nil}
+%define flags %{nil}
+%endif 
+
 for type in %{types}; do
 	if [ "$type" = "base" ]; then
 		libname=atlas
+                arg_options=%{base_options}
+                thread_options=%{threads_option} 
+
 	else
 		libname=atlas-${type}
 	fi
 
 	mkdir -p %{_arch}_${type}
 	pushd %{_arch}_${type}
-	../configure %{mode} %{?threads_option} %{?arch_option} -D c -DWALL -Fa alg '%{armflags} -g -Wa,--noexecstack -fPIC %{ldflags}'\
+	../configure %{mode} $arg_options $thread_options -D c -DWALL -Fa alg '%{flags} -g -Wa,--noexecstack -fPIC %{ldflags}'\
 	--cc=gcc					\
 	--prefix=%{buildroot}%{_prefix}			\
 	--incdir=%{buildroot}%{_includedir}		\
@@ -340,56 +239,6 @@ for type in %{types}; do
 #	--with-netlib-lapack-tarfile=%{SOURCE10}
 
         sed -i 's#SLAPACKlib.*#SLAPACKlib = %{_libdir}/liblapack.so#' Make.inc
-
-%if "%{?enable_native_atlas}" == "0"
-cat Make.inc # enable fof debug only
-%ifarch %{x86_64}
-	if [ "$type" = "base" ]; then
-#		sed -i 's#ARCH =.*#ARCH = HAMMER64SSE2#' Make.inc
-		sed -i 's#ARCH =.*#ARCH = HAMMER64SSE3#' Make.inc
-#		sed -i 's#-DATL_SSE3##' Make.inc
-		sed -i 's#-DATL_AVX##' Make.inc
-#		sed -i 's#-msse3#-msse2#' Make.inc
-#		sed -i 's#-mavx#-msse3#' Make.inc
-		sed -i 's#-mavx[0-9].*#-msse3#' Make.inc
-		sed -i 's#-mavx#-msse3#' Make.inc
-		sed -i 's#MAC##' Make.inc
-		echo 'base makefile edited'
-#		sed -i 's#PMAKE = $(MAKE) .*#PMAKE = $(MAKE) -j 1#' Make.inc
-	elif [ "$type" = "sse3" ]; then
-#		sed -i 's#ARCH =.*#ARCH = Corei264AVX#' Make.inc
-#		sed -i 's#PMAKE = $(MAKE) .*#PMAKE = $(MAKE) -j 1#' Make.inc
-		sed -i 's#-DATL_AVX##' Make.inc
-		sed -i 's#-DATL_SSE2##' Make.inc
-		sed -i 's#-mavx[0-9].*#-msse2#' Make.inc
-		sed -i 's#-mavx#-msse2#' Make.inc
-		sed -i 's#-msse3#-msse2#' Make.inc
-		echo 'sse makefile edited'
-	fi
-%endif
-
-%ifarch %{ix86}
-	if [ "$type" = "base" ]; then
-		sed -i 's#ARCH =.*#ARCH = PPRO32#' Make.inc
-		#sed -i 's#-DATL_SSE3 -DATL_SSE2 -DATL_SSE1##' Make.inc
-		sed -i 's#-DATL_SSE3##' Make.inc
-		sed -i 's#-DATL_SSE2##' Make.inc
-		sed -i 's#-DATL_SSE1##' Make.inc
-		sed -i 's#-mfpmath=sse -msse3#-mfpmath=387#' Make.inc
-	elif [ "$type" = "sse" ]; then
-		sed -i 's#ARCH =.*#ARCH = PIII32SSE1#' Make.inc
-		sed -i 's#-DATL_SSE3#-DATL_SSE1#' Make.inc
-		sed -i 's#-msse3#-msse#' Make.inc
-	elif [ "$type" = "sse2" ]; then
-#		sed -i 's#ARCH =.*#ARCH = P432SSE2#' Make.inc
-		sed -i 's#ARCH =.*#ARCH = x86SSE232SSE2#' Make.inc
-		sed -i 's#-DATL_SSE3#-DATL_SSE2#' Make.inc
-		sed -i 's#-msse3#-msse2#' Make.inc
-	elif [ "$type" = "sse3" ]; then
-		sed -i 's#ARCH =.*#ARCH = P4E32SSE3#' Make.inc
-	fi
-%endif
-
 
 %endif
 	make build
