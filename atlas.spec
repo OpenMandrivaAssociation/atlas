@@ -60,7 +60,6 @@ Patch4:		atlas-throttling.patch
 Patch5:		atlas-shared_libraries.patch
 
 
-#Patch7:		0001-aarch64-support.patch
 Patch8:		atlas-genparse.patch
 # Unbundle LAPACK (BZ #1181369)
 Patch9:		atlas.3.10.1-unbundle.patch
