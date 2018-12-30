@@ -238,6 +238,8 @@ for type in %{types}; do
 
         sed -i 's#SLAPACKlib.*#SLAPACKlib = %{_libdir}/liblapack.so#' Make.inc
 
+        cat Make.inc
+
 	make build
 	cd lib
 	make shared
