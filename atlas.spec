@@ -177,10 +177,10 @@ cp %{SOURCE15} CONFIG/ARCHS/
 
 %ifarch %{arm}
 # Set arm flags in atlcomp.txt
-sed -i -e 's,-mfpu=vfpv3,-mfpu=neon,' CONFIG/src/atlcomp.txt
+#sed -i -e 's,-mfpu=vfpv3,-mfpu=neon,' CONFIG/src/atlcomp.txt
 sed -i -e 's,-mfloat-abi=softfp,-mfloat-abi=hard,' CONFIG/src/atlcomp.txt
 # Some extra arm flags not needed
-sed -i -e 's,-mfpu=vfpv3,,' tune/blas/gemm/CASES/*.flg
+#sed -i -e 's,-mfpu=vfpv3,,' tune/blas/gemm/CASES/*.flg
 %endif
 
 %build
