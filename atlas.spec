@@ -50,7 +50,6 @@ Source14:	ARMv732NEON.tar.bz2
 Source15:	ARMa732.tar.bz2
 Source100:	%{name}.rpmlintrc
 
-Patch2:		atlas-no-m32-on-ARM.patch
 # Properly pass -melf_* to the linker with -Wl, fixes FTBFS bug 817552
 # https://sourceforge.net/tracker/?func=detail&atid=379484&aid=3555789&group_id=23725
 Patch3:		atlas-melf.patch
@@ -152,16 +151,12 @@ fi
 
 %prep
 %setup -q -n ATLAS
-%patch2 -p1 -b .m32arm
 %patch3 -p1 -b .melf
 %patch4 -p1 -b .thrott
 %patch5 -p2 -b .sharedlib
 #affinity crashes with fewer processors than the builder but increases performance of locally builded library
 #% if "%{?enable_native_atlas}" == "0"
 #% patch6 -p1 -b .affinity
-#% endif
-#% ifarch aarch64
-#% patch7 -p1 -b .aarch64
 #% endif
 %patch8 -p1 -b .genparse
 %patch9 -p1
