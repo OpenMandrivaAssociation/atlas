@@ -45,6 +45,7 @@ Source12:	IBMz932.tar.bz2
 Source13:	IBMz964.tar.bz2
 #upstream arm uses softfp abi, fedora arm uses hard
 Source14:	ARMv732NEON.tar.bz2
+Source15:	ARMa732.tar.bz2
 Source100:	%{name}.rpmlintrc
 
 Patch2:		atlas-no-m32-on-ARM.patch
@@ -170,6 +171,7 @@ cp %{SOURCE11} CONFIG/ARCHS/
 cp %{SOURCE12} CONFIG/ARCHS/
 cp %{SOURCE13} CONFIG/ARCHS/
 cp %{SOURCE14} CONFIG/ARCHS/
+cp %{SOURCE15} CONFIG/ARCHS/
 
 %ifarch %{arm}
 # Set arm flags in atlcomp.txt

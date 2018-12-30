@@ -1,7 +1,7 @@
 removed_sources:
   atlas3.10.2.tar.bz2: f1f883e201d70ff60d54a2af016b4afc83a2499b
-
 sources:
+  ARMa732.tar.bz2: 0e11ec19a521973eaa551954debd112c21479e9c
   ARMv732NEON.tar.bz2: 9398518fe55b4a544278237bc639656e04543c50
   IBMz932.tar.bz2: b3ee9bca1510b11c6aa671ba5ba7dff8918ce0cf
   IBMz964.tar.bz2: 43f8d8eaf8cc62bc4665df3550b77e95f3dced22
