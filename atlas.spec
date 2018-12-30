@@ -4,6 +4,8 @@
 %define Werror_cflags %nil
 %global _duplicate_files_terminate_build	0
 
+%define _disable_lto 1
+
 %define enable_native_atlas	0
 %define __isa_bits		32
 %ifarch %{x86_64} aarch64
