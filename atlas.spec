@@ -198,7 +198,7 @@ sed -i -e 's,-mfloat-abi=softfp,-mfloat-abi=hard,' CONFIG/src/atlcomp.txt
 
 %ifarch %ix86
 %define flags %{nil}
-%define base_options "-A PIII -V 512"
+%define base_options "-A PIII -V 1"
 %endif
 
 %ifarch %{arm}
