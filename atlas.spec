@@ -198,12 +198,14 @@ sed -i -e 's,-mfloat-abi=softfp,-mfloat-abi=hard,' CONFIG/src/atlcomp.txt
 
 %ifarch %ix86
 %define flags %{nil}
-%define base_options "-A PIII -V 1"
+%define base_options "-A PIII -V 512"
+%define threads_option "-t 0"
 %endif
 
 %ifarch %{arm}
 %define flags "-DATL_ARM_HARDFP=1"
 %define base_options "-A ARMv7 -V 1"
+%define threads_option "-t 0"
 %endif
 
 %ifarch aarch64
