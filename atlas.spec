@@ -199,13 +199,11 @@ sed -i -e 's,-mfloat-abi=softfp,-mfloat-abi=hard,' CONFIG/src/atlcomp.txt
 %ifarch %ix86
 %define flags %{nil}
 %define base_options "-A PIII -V 512"
-%define threads_option "-t 0"
 %endif
 
 %ifarch %{arm}
 %define flags "-DATL_ARM_HARDFP=1"
 %define base_options "-A ARMv7 -V 1"
-%define threads_option "-t 0"
 %endif
 
 %ifarch aarch64
@@ -231,7 +229,11 @@ for type in %{types}; do
 
 	mkdir -p %{_arch}_${type}
 	pushd %{_arch}_${type}
-	../configure %{mode} $arg_options $thread_options -D c -DWALL -Fa alg '%{flags} -g -Wa,--noexecstack -fPIC %{ldflags}'\
+%ifarch %{ix86} %{arm}
+	../configure %{mode} $arg_options $thread_options -D c -DWALL -Fa alg '%{flags} -g -Wa,--noexecstack -fPIC'\
+%else
+        ../configure %{mode} $arg_options $thread_options -D c -DWALL -Fa alg '%{flags} -g -Wa,--noexecstack -fPIC %{ldflags}'\
+%endif
 	--cc=gcc					\
 	--prefix=%{buildroot}%{_prefix}			\
 	--incdir=%{buildroot}%{_includedir}		\
