@@ -77,7 +77,6 @@ well as a few routines from LAPACK.
 %package -n %{libname}
 Summary:	Automatically Tuned Linear Algebra Software
 Provides:	%{libatlas} = %{version}-%{release}
-Obsoletes:	%{libatlas}-devel
 Obsoletes:	%{libatlas}-sse2 < %{EVRD}
 Obsoletes:	%{libatlas}-sse3 < %{EVRD}
 %ifnarch %{ix86} %{x86_64}
