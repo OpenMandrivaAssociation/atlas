@@ -1,0 +1,239 @@
+diff --git a/CONFIG/include/atlconf.h b/CONFIG/include/atlconf.h
+index e51d56d..5aa3576 100644
+--- a/CONFIG/include/atlconf.h
++++ b/CONFIG/include/atlconf.h
+@@ -16,7 +16,7 @@ enum OSTYPE {OSOther=0, OSLinux, OSSunOS, OSSunOS4, OSOSF1, OSIRIX, OSAIX,
+                        ((OS_) == OSWin64) )
+ 
+ enum ARCHFAM {AFOther=0, AFPPC, AFSPARC, AFALPHA, AFX86, AFIA64, AFMIPS,
+-              AFARM, AFS390};
++              AFARM, AFS390, AFRISCV64};
+ 
+ /*
+  * Corei1: Nahalem / Westmere
+@@ -25,7 +25,7 @@ enum ARCHFAM {AFOther=0, AFPPC, AFSPARC, AFALPHA, AFX86, AFIA64, AFMIPS,
+  * Corei3EP: v3 Haswell, E5-26XX
+  * Corei4: skylake
+  */
+-#define NMACH 62
++#define NMACH 63
+ static char *machnam[NMACH] =
+    {"UNKNOWN", "PPCG4", "PPCG5", "POWER3", "POWER4", "POWER5",
+     "POWER6", "POWER7", "POWER8", "POWERe6500",
+@@ -39,7 +39,8 @@ static char *machnam[NMACH] =
+     "USI", "USII", "USIII", "USIV", "UST1", "UST2", "UnknownUS",
+     "MIPSR1xK", "MIPSICE9",
+     "ARMa7", "ARMa9", "ARMa15", "ARMa17",
+-    "ARM64xgene1", "ARM64a53", "ARM64a57"};
++    "ARM64xgene1", "ARM64a53", "ARM64a57",
++    "RISCV64"};
+ enum MACHTYPE {MACHOther, PPCG4, PPCG5, IbmPwr3, IbmPwr4, IbmPwr5,
+                IbmPwr6, IbmPwr7, IbmPwr8, Pwre6500,
+                IbmZ9, IbmZ10, IbmZ196, IbmZ12, IbmZ13, /* s390(x) in Linux */
+@@ -58,7 +59,8 @@ enum MACHTYPE {MACHOther, PPCG4, PPCG5, IbmPwr3, IbmPwr4, IbmPwr5,
+                ARM17,     /* lots of tablets */
+                ARM64xg,     /* includes ARMv8 */
+                ARM64a53,
+-               ARM64a57
++               ARM64a57,
++               RISCV64
+                };
+ #define MachIsX86(mach_) \
+    ( (mach_) >= x86x87 && (mach_) <= x86X )
+@@ -83,6 +85,8 @@ enum MACHTYPE {MACHOther, PPCG4, PPCG5, IbmPwr3, IbmPwr4, IbmPwr5,
+    ( (mach_) >= ARM64xg && || (mach_) <= ARM64a57)
+ #define MachIsS390(mach_) \
+    ( (mach_) >= IbmZ9 && (mach_) <= IbmZ13 )
++#define MachIsRISCV64(mach_) \
++   ( (mach_) == RISCV64)
+ 
+ 
+ static char *f2c_namestr[5] = {"UNKNOWN","Add_", "Add__", "NoChange", "UpCase"};
+@@ -106,13 +110,13 @@ enum ISAEXT
+     ISA_AVXMAC, ISA_AVXFMA4, ISA_AVX, ISA_SSE3, ISA_SSE2, ISA_SSE1, ISA_3DNow,
+     ISA_NEON, ISA_NEON16, ISA_VFP3D32MAC, ISA_VFP3D16MAC};
+ 
+-#define NASMD 11
++#define NASMD 12
+ enum ASMDIA
+    {ASM_None=0, gas_x86_32, gas_x86_64, gas_sparc, gas_ppc, gas_parisc,
+-    gas_mips, gas_arm, gas_arm64, gas_wow64, gas_s390};
++    gas_mips, gas_arm, gas_arm64, gas_wow64, gas_s390, gas_riscv64};
+ static char *ASMNAM[NASMD] =
+    {"",     "GAS_x8632", "GAS_x8664", "GAS_SPARC", "GAS_PPC", "GAS_PARISC",
+-    "GAS_MIPS", "GAS_ARM", "GAS_ARM64", "GAS_WOW64", "GAS_S390"};
++    "GAS_MIPS", "GAS_ARM", "GAS_ARM64", "GAS_WOW64", "GAS_S390", "GAS_RISCV64"};
+ 
+ /*
+  * Used for archinfo probes (can pack in bitfield)
+diff --git a/CONFIG/src/Makefile b/CONFIG/src/Makefile
+index 212b9d7..171aa20 100644
+--- a/CONFIG/src/Makefile
++++ b/CONFIG/src/Makefile
+@@ -323,6 +323,11 @@ IRun_GAS_PPC :
+ 	$(MAKE) $(atlrun) atldir=$(mydir) exe=xprobe_gas_ppc args="$(args)" \
+                 redir=config0.out
+ 	- cat config0.out
++IRun_GAS_RISCV64 :
++	$(CC) $(CCFLAGS) -o xprobe_gas_riscv64 $(SRCdir)/backend/probe_this_asm.c $(SRCdir)/backend/probe_gas_riscv64.S
++	$(MAKE) $(atlrun) atldir=$(mydir) exe=xprobe_gas_riscv64 args="$(args)" \
++                redir=config0.out
++	- cat config0.out
+ IRun_GAS_x8664 :
+ 	$(CC) $(CCFLAGS) -o xprobe_gas_x8664 $(SRCdir)/backend/probe_this_asm.c $(SRCdir)/backend/probe_gas_x8664.S
+ 	$(MAKE) $(atlrun) atldir=$(mydir) exe=xprobe_gas_x8664 args="$(args)" \
+diff --git a/CONFIG/src/SpewMakeInc.c b/CONFIG/src/SpewMakeInc.c
+index 097d7b9..9206363 100644
+--- a/CONFIG/src/SpewMakeInc.c
++++ b/CONFIG/src/SpewMakeInc.c
+@@ -401,6 +401,8 @@ char *GetPtrbitsFlag(enum OSTYPE OS, enum MACHTYPE arch, int ptrbits,
+ 
+    if (MachIsIA64(arch))
+       return(sp);
++   if (MachIsRISCV64(arch))
++      return(sp);
+    if (MachIsMIPS(arch))
+       return((ptrbits == 64) ? "-mabi=64" : "-mabi=n32");
+    if (MachIsS390(arch))
+diff --git a/CONFIG/src/atlcomp.txt b/CONFIG/src/atlcomp.txt
+index aa31604..e8ed3ca 100644
+--- a/CONFIG/src/atlcomp.txt
++++ b/CONFIG/src/atlcomp.txt
+@@ -328,6 +328,21 @@ MACH=ARM64a53 OS=ALL LVL=1000 COMPS=dmc
+ MACH=ARM64a53 OS=ALL LVL=1000 COMPS=f77
+    'gfortran' '-O2 -mcpu=cortex-a53'
+ #
++# RISCV64 defaults (untested)
++#
++MACH=RISCV64 OS=ALL LVL=1000 COMPS=f77
++   'gfortran' '-O2'
++MACH=RISCV64 OS=ALL LVL=1000 COMPS=xcc
++   'gcc' '-O2'
++MACH=RISCV64 OS=ALL LVL=1000 COMPS=icc
++   'gcc' '-O2'
++MACH=RISCV64 OS=ALL LVL=1000 COMPS=skc,gcc,dkc
++   'gcc' '-O3'
++MACH=RISCV64 OS=ALL LVL=1100 COMPS=dmc,smc
++   'gcc' '-O1'
++MACH=RISCV64 OS=ALL LVL=1000 COMPS=f77
++   'gfortran' '-O2'
++#
+ # Generic defaults
+ #
+ MACH=ALL OS=ALL LVL=4 COMPS=smc,dmc,skc,dkc,icc,gcc,xcc
+diff --git a/CONFIG/src/atlconf_misc.c b/CONFIG/src/atlconf_misc.c
+index 63cb1ef..fa91026 100644
+--- a/CONFIG/src/atlconf_misc.c
++++ b/CONFIG/src/atlconf_misc.c
+@@ -573,6 +573,7 @@ enum ARCHFAM ProbeArchFam(char *targ)
+       else if (strstr(res, "mips")) fam = AFMIPS;
+       else if (strstr(res, "arm")) fam = AFARM;
+       else if (strstr(res, "aarch64")) fam = AFARM;
++      else if (strstr(res, "riscv64")) fam = AFRISCV64;
+       else if (strstr(res, "s390")) fam = AFS390;
+       else if ( strstr(res, "i686") || strstr(res, "i586") ||
+                 strstr(res, "i486") || strstr(res, "i386") ||
+@@ -599,6 +600,7 @@ enum ARCHFAM ProbeArchFam(char *targ)
+          else if (strstr(res, "mips")) fam = AFMIPS;
+          else if (strstr(res, "arm")) fam = AFARM;
+          else if (strstr(res, "aarch64")) fam = AFARM;
++         else if (strstr(res, "riscv64")) fam = AFRISCV64;
+          else if (strstr(res, "s390")) fam = AFS390;
+          free(res);
+       }
+diff --git a/CONFIG/src/backend/Make.ext b/CONFIG/src/backend/Make.ext
+index 4743353..572e286 100644
+--- a/CONFIG/src/backend/Make.ext
++++ b/CONFIG/src/backend/Make.ext
+@@ -35,7 +35,7 @@ files = archinfo_aix.c archinfo_freebsd.c archinfo_irix.c archinfo_linux.c \
+         probe_aff_PLPA.c probe_aff_RUNON.c probe_aff_SCHED.c \
+         probe_aff_SETAFFNP.c probe_aff_SETPROCNP.c probe_aff_WIN.c \
+         probe_aff_WIN64.c probe_arm32_FPABI.c probe_dAVX.c probe_dSSE3.c \
+-        probe_dmac.c probe_dvec.c probe_gas_arm.S probe_gas_arm64.S \
++        probe_dmac.c probe_dvec.c probe_gas_arm.S probe_gas_arm64.S probe_gas_riscv64.S \
+         probe_gas_mips.S probe_gas_parisc.S probe_gas_ppc.S probe_gas_s390.S \
+         probe_gas_sparc.S probe_gas_wow64.S probe_gas_x8632.S \
+         probe_gas_x8664.S probe_smac.c probe_svec.c probe_this_asm.c \
+@@ -65,6 +65,8 @@ probe_gas_arm.S : $(basf)
+ 	$(extC) -b $(basf) -o probe_gas_arm.S rout=probe_gas_arm.S
+ probe_gas_arm64.S : $(basf)
+ 	$(extC) -b $(basf) -o probe_gas_arm64.S rout=probe_gas_arm64.S
++probe_gas_riscv64.S : $(basf)
++	$(extC) -b $(basf) -o probe_gas_riscv64.S rout=probe_gas_riscv64.S
+ probe_gas_s390.S : $(basf)
+ 	$(extC) -b $(basf) -o probe_gas_s390.S rout=probe_gas_s390.S
+ probe_AVXMAC.S : $(basf)
+diff --git a/CONFIG/src/backend/archinfo_linux.c b/CONFIG/src/backend/archinfo_linux.c
+index cdcee92..d37e7a8 100644
+--- a/CONFIG/src/backend/archinfo_linux.c
++++ b/CONFIG/src/backend/archinfo_linux.c
+@@ -340,6 +340,14 @@ enum MACHTYPE ProbeArch()
+          free(res);
+       }
+       break;
++   case AFRISCV64:
++      res = atlsys_1L(NULL, "fgrep 'isa' /proc/cpuinfo", 0, 0);
++      if (res)
++      {
++         if (strstr(res, "rv64imafdc")) mach = RISCV64;
++         free(res);
++      }
++      break;
+    default:
+ #if 0
+       if (!CmndOneLine(NULL, "fgrep 'cpu family' /proc/cpuinfo", res))
+diff --git a/CONFIG/src/backend/probe_gas_riscv64.S b/CONFIG/src/backend/probe_gas_riscv64.S
+new file mode 100644
+index 0000000..2af81ef
+--- /dev/null
++++ b/CONFIG/src/backend/probe_gas_riscv64.S
+@@ -0,0 +1,15 @@
++#include "atlas_asm.h"
++#
++# Linux RISCV64 assembly for:
++# int asm_probe(int i)
++# RETURNS: i*3
++#
++
++.text
++.globl  ATL_asmdecor(asm_probe)
++.type   ATL_asmdecor(asm_probe), %function
++ATL_asmdecor(asm_probe):
++        slliw   a5,a0,0x1
++        addw    a0,a0,a5
++        ret
++.size ATL_asmdecor(asm_probe),.-ATL_asmdecor(asm_probe)
+diff --git a/CONFIG/src/probe_comp.c b/CONFIG/src/probe_comp.c
+index 1652e24..cdf9991 100644
+--- a/CONFIG/src/probe_comp.c
++++ b/CONFIG/src/probe_comp.c
+@@ -595,6 +595,8 @@ char *GetPtrbitsFlag(enum OSTYPE OS, enum MACHTYPE arch, int ptrbits,
+ 
+    if (MachIsIA64(arch))
+       return(sp);
++   if (MachIsRISCV64(arch))
++      return(sp);
+    if (MachIsMIPS(arch))
+       return((ptrbits == 64) ? "-mabi=64" : "-mabi=n32");
+    if (MachIsS390(arch))
+diff --git a/include/atlas_genparse.h b/include/atlas_genparse.h
+index bc3fbf9..bb22244 100644
+--- a/include/atlas_genparse.h
++++ b/include/atlas_genparse.h
+@@ -6,13 +6,13 @@
+ #include <assert.h>
+ #include <string.h>
+ #include <ctype.h>
+-#define NASMD 11
++#define NASMD 12
+ enum ASMDIA
+    {ASM_None=0, gas_x86_32, gas_x86_64, gas_sparc, gas_ppc, gas_parisc,
+-    gas_mips, gas_arm, gas_arm64, gas_wow64, gas_s390};
++    gas_mips, gas_arm, gas_arm64, gas_wow64, gas_s390, gas_riscv64};
+ static char *ASMNAM[NASMD] =
+    {"",     "GAS_x8632", "GAS_x8664", "GAS_SPARC", "GAS_PPC", "GAS_PARISC",
+-    "GAS_MIPS", "GAS_ARM", "GAS_ARM64", "GAS_WOW64", "GAS_S390"};
++    "GAS_MIPS", "GAS_ARM", "GAS_ARM64", "GAS_WOW64", "GAS_S390", "GAS_RISCV64"};
+ /*
+  * Basic data structure for forming queues with some minimal info
+  */

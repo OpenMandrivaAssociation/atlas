@@ -62,6 +62,7 @@ Patch5:		atlas-shared_libraries.patch
 Patch8:		atlas-genparse.patch
 # Unbundle LAPACK (BZ #1181369)
 Patch9:		atlas.3.10.1-unbundle.patch
+Patch10:	atlas-riscv64-port.patch
 
 BuildRequires:	gcc-gfortran
 BuildRequires:	lapack-devel
@@ -159,6 +160,7 @@ fi
 #% endif
 %patch8 -p1 -b .genparse
 %patch9 -p1
+%patch10 -p1
 
 cp %{SOURCE1} CONFIG/ARCHS/
 cp %{SOURCE3} doc
@@ -208,6 +210,11 @@ sed -i -e 's,-mfloat-abi=softfp,-mfloat-abi=hard,' CONFIG/src/atlcomp.txt
 %ifarch aarch64
 %define flags %{nil}
 %define base_options "-A ARM64a53 -V 1"
+%endif
+
+%ifarch riscv64
+%define flags %{nil}
+%define base_options "-A RISCV64 -V 1"
 %endif
 
 %if "%{?enable_native_atlas}" != "0"
