@@ -8,7 +8,7 @@
 
 %define enable_native_atlas	0
 %define __isa_bits		32
-%ifarch %{x86_64} aarch64
+%ifarch %{x86_64} aarch64 riscv64
 	%define __isa_bits	64
 %endif
 
