@@ -201,7 +201,7 @@ export CXX=g++
 # (tpg) get rid of error
 # x86_64-linux-gnu-gcc-8.3.0: error: 64: No such file or directory
 # x86_64-linux-gnu-gcc-8.3.0: error: unrecognized command line option '-m'
-%global optflags $(echo %{optflags} | sed -e 's/-m64//g')
+%global optflags %(echo %{optflags}|sed -e 's/-m64//g')
 %endif
 
 %ifarch %{ix86}
