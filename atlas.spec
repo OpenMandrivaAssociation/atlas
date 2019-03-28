@@ -255,10 +255,10 @@ for type in %{types}; do
     sed -i 's#SLAPACKlib.*#SLAPACKlib = %{_libdir}/liblapack.so#' Make.inc
     cat Make.inc
 
-    %make_build build
+    %make_build -j1 build
     cd lib
-    %make_build shared
-    %make_build ptshared
+    %make_build -j1 shared
+    %make_build -j1 ptshared
     popd
 done
 
