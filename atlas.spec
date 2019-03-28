@@ -2,18 +2,18 @@
 # http://pkgs.fedoraproject.org/cgit/atlas.git
 
 %define Werror_cflags %nil
-%global _duplicate_files_terminate_build	0
+%global _duplicate_files_terminate_build 0
 
 %define _disable_lto 1
 
-%define enable_native_atlas	0
-%define __isa_bits		32
+%define enable_native_atlas 0
+%define __isa_bits 32
 %ifarch %{x86_64} aarch64 riscv64
-	%define __isa_bits	64
+%define __isa_bits 64
 %endif
 
-%define types			base
-%define pr_base			%(echo $((%{__isa_bits}+0)))
+%define types base
+%define pr_base %(echo $((%{__isa_bits}+0)))
 
 # Keep these libraries private because they are not in %%{_libdir}
 #% if %{_use_internal_dependency_generator}
@@ -21,18 +21,18 @@
 #% define __noautoreq 'libsatlas\\.so\\.(.*)|libtatlas\\.so\\.(.*)'
 #% endif
 
-%define major		3
-%define libatlas	libatlas
+%define major 3
+%define libatlas libatlas
 
-%define libname		%mklibname %{name} %{major}
-%define devname		%mklibname %{name} -d
+%define libname %mklibname %{name} %{major}
+%define devname %mklibname %{name} -d
 
 %global optflags %{optflags} -O3
 
 Name:		atlas
 Version:	3.10.3
 %if "%{?enable_native_atlas}" != "0"
-	%define dist	.native
+%define dist .native
 %endif
 Release:	3
 Summary:	Automatically Tuned Linear Algebra Software
@@ -128,14 +128,12 @@ This package contains headers for development with ATLAS
 
 %posttrans -n %{devname}
 if [ $1 -eq 0 ] ; then
-	/usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel	\
-	%{_includedir}/atlas-%{_arch}-base %{pr_base}
+    /usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel %{_includedir}/atlas-%{_arch}-base %{pr_base}
 fi
 
 %preun -n %{devname}
 if [ $1 -ge 0 ] ; then
-	/usr/sbin/alternatives --remove atlas-devel				\
-	%{_includedir}/atlas-%{_arch}-base
+    /usr/sbin/alternatives --remove atlas-devel %{_includedir}/atlas-%{_arch}-base
 fi
 
 %files -n %{devname}
@@ -181,6 +179,9 @@ sed -i -e 's,-mfloat-abi=softfp,-mfloat-abi=hard,' CONFIG/src/atlcomp.txt
 %endif
 
 %build
+%setup_compile_flags
+export CC=gcc
+export CXX=g++
 
 %ifarch %{arm}
 %global mode %{nil}
@@ -197,9 +198,13 @@ sed -i -e 's,-mfloat-abi=softfp,-mfloat-abi=hard,' CONFIG/src/atlcomp.txt
 %ifarch %{x86_64}
 %define flags %{nil}
 %define base_options "-A HAMMER -V 896"
+# (tpg) get rid of error
+# x86_64-linux-gnu-gcc-8.3.0: error: 64: No such file or directory
+# x86_64-linux-gnu-gcc-8.3.0: error: unrecognized command line option '-m'
+%global optflags $(echo %{optflags} | sed -e 's/-m64//g')
 %endif
 
-%ifarch %ix86
+%ifarch %{ix86}
 %define flags %{nil}
 %define base_options "-A PIII -V 512"
 %endif
@@ -220,69 +225,65 @@ sed -i -e 's,-mfloat-abi=softfp,-mfloat-abi=hard,' CONFIG/src/atlcomp.txt
 %endif
 
 %if "%{?enable_native_atlas}" != "0"
-%define    threads_option %{nil}
+%define threads_option %{nil}
 %define base_options %{nil}
 %define flags %{nil}
-%endif 
+%endif
 
 for type in %{types}; do
-	if [ "$type" = "base" ]; then
-		libname=atlas
-                arg_options=%{base_options}
-                thread_options=%{threads_option} 
+    if [ "$type" = "base" ]; then
+	libname=atlas
+	arg_options=%{base_options}
+	thread_options=%{threads_option}
+    else
+	libname=atlas-${type}
+    fi
 
-	else
-		libname=atlas-${type}
-	fi
-
-	mkdir -p %{_arch}_${type}
-	pushd %{_arch}_${type}
+    mkdir -p %{_arch}_${type}
+    pushd %{_arch}_${type}
 %ifarch %{ix86} %{arm}
-	../configure %{mode} $arg_options $thread_options -D c -DWALL -Fa alg '%{flags} -g -Wa,--noexecstack -fPIC'\
+    ../configure %{mode} $arg_options $thread_options -D c -DWALL -Fa alg '%{flags} -g -Wa,--noexecstack -fPIC' \
 %else
-        ../configure %{mode} $arg_options $thread_options -D c -DWALL -Fa alg '%{flags} -g -Wa,--noexecstack -fPIC %{ldflags}'\
+    ../configure %{mode} $arg_options $thread_options -D c -DWALL -Fa alg '%{flags} -g -Wa,--noexecstack -fPIC %{ldflags}' \
 %endif
-	--cc=gcc					\
-	--prefix=%{buildroot}%{_prefix}			\
-	--incdir=%{buildroot}%{_includedir}		\
-	--libdir=%{buildroot}%{_libdir}/${libname}
-#	--with-netlib-lapack-tarfile=%{SOURCE10}
+    --cc=gcc \
+    --prefix=%{buildroot}%{_prefix} \
+    --incdir=%{buildroot}%{_includedir} \
+    --libdir=%{buildroot}%{_libdir}/${libname}
+#    --with-netlib-lapack-tarfile=%{SOURCE10}
 
-        sed -i 's#SLAPACKlib.*#SLAPACKlib = %{_libdir}/liblapack.so#' Make.inc
+    sed -i 's#SLAPACKlib.*#SLAPACKlib = %{_libdir}/liblapack.so#' Make.inc
+    cat Make.inc
 
-        cat Make.inc
-
-	make build
-	cd lib
-	make shared
-	make ptshared
-	popd
+    %make_build build
+    cd lib
+    %make_build shared
+    %make_build ptshared
+    popd
 done
 
 ########################################################################
 
 %install
 for type in %{types}; do
-	pushd %{_arch}_${type}
-	make DESTDIR=%{buildroot} install
-	mv %{buildroot}%{_includedir}/atlas %{buildroot}%{_includedir}/atlas-%{_arch}-${type}
-	if [ "$type" = "base" ]; then
-		cp -pr lib/*.so* %{buildroot}%{_libdir}/atlas/
-		rm -f %{buildroot}%{_libdir}/atlas/*.a
-	else
-		cp -pr lib/*.so* %{buildroot}%{_libdir}/atlas-${type}/
-		rm -f %{buildroot}%{_libdir}/atlas-${type}/*.a
-	fi
-	popd
+    pushd %{_arch}_${type}
+    %make_install DESTDIR=%{buildroot} install
+    mv %{buildroot}%{_includedir}/atlas %{buildroot}%{_includedir}/atlas-%{_arch}-${type}
+    if [ "$type" = "base" ]; then
+	cp -pr lib/*.so* %{buildroot}%{_libdir}/atlas/
+	rm -f %{buildroot}%{_libdir}/atlas/*.a
+    else
+	cp -pr lib/*.so* %{buildroot}%{_libdir}/atlas-${type}/
+	rm -f %{buildroot}%{_libdir}/atlas-${type}/*.a
+    fi
+    popd
 
-	mkdir -p %{buildroot}/etc/ld.so.conf.d
-	if [ "$type" = "base" ]; then
-		echo "%{_libdir}/atlas"		\
-		> %{buildroot}/etc/ld.so.conf.d/atlas-%{_arch}.conf
-	else
-		echo "%{_libdir}/atlas-${type}"	\
-		> %{buildroot}/etc/ld.so.conf.d/atlas-%{_arch}-${type}.conf
-	fi
+    mkdir -p %{buildroot}/etc/ld.so.conf.d
+    if [ "$type" = "base" ]; then
+	echo "%{_libdir}/atlas" > %{buildroot}/etc/ld.so.conf.d/atlas-%{_arch}.conf
+    else
+	echo "%{_libdir}/atlas-${type}" > %{buildroot}/etc/ld.so.conf.d/atlas-%{_arch}-${type}.conf
+    fi
 done
 mkdir -p %{buildroot}%{_includedir}/atlas
 
@@ -300,8 +301,8 @@ DATA
 
 %check
 for type in %{types}; do
-	pushd %{_arch}_${type}
-	make check ptcheck || :
-	popd
+    pushd %{_arch}_${type}
+    make check ptcheck || :
+    popd
 done
 
