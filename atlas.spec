@@ -27,7 +27,12 @@
 %define libname %mklibname %{name} %{major}
 %define devname %mklibname %{name} -d
 
-%global optflags %{optflags} -O3
+# "-msse2", "-mavx2 and similar compiler flags get garbled by Atlas'
+# build system inserting spaces. This should be fixed properly at some
+# point...
+%ifarch znver1
+%global optflags -O3 -march=znver1 -mtune=znver1 -mfpmath=sse
+%endif
 
 Name:		atlas
 Version:	3.10.3
