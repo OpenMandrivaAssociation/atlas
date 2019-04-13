@@ -34,7 +34,7 @@ Version:	3.10.3
 %if "%{?enable_native_atlas}" != "0"
 %define dist .native
 %endif
-Release:	3
+Release:	1
 Summary:	Automatically Tuned Linear Algebra Software
 License:	BSD
 Group:		Sciences/Mathematics
@@ -42,7 +42,7 @@ URL:		http://math-atlas.sourceforge.net/
 Source0:	http://downloads.sourceforge.net/math-atlas/%{name}%{version}.tar.bz2
 Source1:	PPRO32.tgz
 Source3:	README.dist
-Source10:	http://www.netlib.org/lapack/lapack-3.6.0.tgz
+Source10:	https://github.com/Reference-LAPACK/lapack/archive/v3.8.0.tar.gz
 #archdefs taken from debian:
 Source11:	POWER332.tar.bz2
 Source12:	IBMz932.tar.bz2
@@ -249,8 +249,8 @@ for type in %{types}; do
     --cc=gcc \
     --prefix=%{buildroot}%{_prefix} \
     --incdir=%{buildroot}%{_includedir} \
-    --libdir=%{buildroot}%{_libdir}/${libname}
-#    --with-netlib-lapack-tarfile=%{SOURCE10}
+    --libdir=%{buildroot}%{_libdir}/${libname} \
+    --with-netlib-lapack-tarfile=%{S:10}
 
     sed -i 's#SLAPACKlib.*#SLAPACKlib = %{_libdir}/liblapack.so#' Make.inc
     cat Make.inc
