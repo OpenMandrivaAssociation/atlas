@@ -33,6 +33,9 @@
 %ifarch znver1
 %global optflags -O3 -march=znver1 -mtune=znver1 -mfpmath=sse
 %endif
+%ifarch riscv64
+%global optflags
+%endif
 
 Name:		atlas
 Version:	3.10.3
