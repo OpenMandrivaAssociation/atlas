@@ -34,7 +34,7 @@
 %global optflags -O3 -march=znver1 -mtune=znver1 -mfpmath=sse
 %endif
 %ifarch riscv64
-%global optflags
+%global optflags %nil
 %endif
 
 Name:		atlas
