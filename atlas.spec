@@ -60,19 +60,22 @@ Source14:	ARMv732NEON.tar.bz2
 Source15:	ARMa732.tar.bz2
 Source100:	%{name}.rpmlintrc
 
+Patch2:         atlas-fedora-arm.patch
 # Properly pass -melf_* to the linker with -Wl, fixes FTBFS bug 817552
 # https://sourceforge.net/tracker/?func=detail&atid=379484&aid=3555789&group_id=23725
-Patch3:		atlas-melf.patch
-Patch4:		atlas-throttling.patch
+Patch3:         atlas-melf.patch
+Patch4:         atlas-throttling.patch
 
 #credits Lukas Slebodnik
-Patch5:		atlas-shared_libraries.patch
+Patch5:         atlas-shared_libraries.patch
 
+Patch8:         atlas-genparse.patch
 
-Patch8:		atlas-genparse.patch
 # Unbundle LAPACK (BZ #1181369)
-Patch9:		atlas.3.10.1-unbundle.patch
-Patch10:	atlas-riscv64-port.patch
+Patch9:         atlas.3.10.1-unbundle.patch
+Patch10:        atlas-gcc10.patch
+Patch11:	atlas-riscv64-port.patch
+
 
 BuildRequires:	gcc-gfortran
 BuildRequires:	lapack-devel
@@ -159,16 +162,18 @@ fi
 
 %prep
 %setup -q -n ATLAS
+#patch0 -p0 -b .shared
+#arm patch not applicable, probably not needed
+#%ifarch %{arm}
+#%patch2 -p0 -b .arm
+#%endif
 %patch3 -p1 -b .melf
 %patch4 -p1 -b .thrott
 %patch5 -p2 -b .sharedlib
-#affinity crashes with fewer processors than the builder but increases performance of locally builded library
-#% if "%{?enable_native_atlas}" == "0"
-#% patch6 -p1 -b .affinity
-#% endif
 %patch8 -p1 -b .genparse
-%patch9 -p1
+%patch9 -p1 -b .unbundle
 %patch10 -p1
+%patch11 -p1
 
 cp %{SOURCE1} CONFIG/ARCHS/
 cp %{SOURCE3} doc
