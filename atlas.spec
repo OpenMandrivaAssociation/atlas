@@ -142,7 +142,7 @@ if [ $1 -eq 0 ] ; then
     /usr/sbin/alternatives --install %{_includedir}/atlas atlas-devel %{_includedir}/atlas-%{_arch}-base %{pr_base}
 fi
 
-%preun -n %{devname}
+%postun -n %{devname}
 if [ $1 -ge 0 ] ; then
     /usr/sbin/alternatives --remove atlas-devel %{_includedir}/atlas-%{_arch}-base
 fi
