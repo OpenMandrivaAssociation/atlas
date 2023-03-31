@@ -42,7 +42,7 @@ Version:	3.10.3
 %if "%{?enable_native_atlas}" != "0"
 %define dist .native
 %endif
-Release:	2
+Release:	3
 Summary:	Automatically Tuned Linear Algebra Software
 License:	BSD
 Group:		Sciences/Mathematics
